@@ -1,0 +1,67 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | EXIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body class="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-exis-primary selection:text-white">
+    <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 border-b border-slate-200/60">
+      <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-12 h-12 bg-exis-primary rounded-2xl flex items-center justify-center shadow-lg shadow-exis-primary/20 transform group-hover:rotate-6 transition-transform">
+            <span class="text-white font-black text-xl italic">E</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-black tracking-tighter text-exis-primary">EXIS <span class="text-exis-secondary">2026</span></h1>
+            <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-400 -mt-1">Innovation Expo</p>
+          </div>
+        </a>
+        <nav class="flex items-center gap-6">
+          <a href="/dashboard" class="text-sm font-bold text-slate-600 hover:text-exis-primary transition-colors">
+            Dashboard
+          </a>
+          <a href="/" class="btn-primary text-sm py-2 px-5">
+            Registrar
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-16">
+      <slot />
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-12">
+      <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+          <div class="flex items-center gap-3 grayscale opacity-50">
+            <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
+              <span class="text-white font-bold text-sm">E</span>
+            </div>
+            <span class="font-bold tracking-tighter uppercase text-xs">EXIS 2026</span>
+          </div>
+          <p class="text-slate-400 text-sm font-medium italic text-center md:text-left">Transformando ideas en realidades tecnológicas.</p>
+          <div class="text-slate-400 text-xs font-bold">
+            &copy; 2026 UNIVERSIDAD EXIS
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

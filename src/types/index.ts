@@ -1,0 +1,18 @@
+export type Category = 'Desarrollo web' | 'Inteligencia Artificial' | 'Desarrollo Fullstack';
+
+export interface Student {
+  document_id: string;
+  name: string;
+  semester: string;
+  subject1: string;
+  subject2?: string;
+  email: string;
+  phone: string;
+}
+
+export interface Project {
+  name: string;
+  description: string;
+  category: Category;
+  students: Student[];
+}

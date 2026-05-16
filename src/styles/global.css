@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@theme {
+  --color-exis-primary: #00594E;
+  --color-exis-secondary: #B5A160;
+  --color-exis-accent: #36BCEE;
+  
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative overflow-hidden bg-exis-primary text-white font-bold py-3 px-6 rounded-xl 
+           shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-exis-primary/20 
+           active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .card-modern {
+    @apply bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 
+           transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,89,78,0.05)];
+  }
+
+  .input-modern {
+    @apply w-full px-4 py-3 bg-gray-50 border-2 border-transparent rounded-2xl 
+           focus:bg-white focus:border-exis-primary focus:ring-4 focus:ring-exis-primary/10 
+           outline-none transition-all duration-300 placeholder:text-gray-400 text-gray-700;
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

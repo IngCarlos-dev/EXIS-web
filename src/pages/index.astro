@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RegistrationForm from '../components/RegistrationForm';
+---
+
+<Layout title="Registro de Proyectos">
+	<div class="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+		<div class="text-center space-y-6 max-w-3xl mx-auto">
+			<div class="inline-flex items-center gap-2 px-4 py-2 bg-exis-primary/5 rounded-full text-exis-primary text-xs font-black uppercase tracking-widest animate-float">
+				<span class="relative flex h-2 w-2">
+				  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-exis-primary opacity-75"></span>
+				  <span class="relative inline-flex rounded-full h-2 w-2 bg-exis-primary"></span>
+				</span>
+				Convocatoria 2026
+			</div>
+			<h2 class="text-5xl md:text-7xl font-black text-slate-800 tracking-tighter leading-[0.9]">
+				Desata tu <span class="text-exis-primary italic">potencial</span> tecnológico.
+			</h2>
+			<p class="text-lg text-slate-400 font-medium leading-relaxed">
+				Únete a la exhibición de innovación más prestigiosa. Registra tu proyecto y conecta con la vanguardia del desarrollo.
+			</p>
+		</div>
+
+		<RegistrationForm client:load />
+	</div>
+</Layout>
