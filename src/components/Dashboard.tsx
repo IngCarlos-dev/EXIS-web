@@ -78,7 +78,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           { label: 'Proyectos', value: stats.totalProjects, icon: LayoutDashboard, color: 'text-exis-primary', bg: 'bg-exis-primary/5' },
-          { label: 'Talento Humano', value: projects.reduce((acc, p) => acc + p.students.length, 0), icon: Users, color: 'text-exis-secondary', bg: 'bg-exis-secondary/5' },
+          { label: 'Participantes', value: projects.reduce((acc, p) => acc + p.students.length, 0), icon: Users, color: 'text-exis-secondary', bg: 'bg-exis-secondary/5' },
           { label: 'Categorías', value: stats.categoryData.length, icon: Briefcase, color: 'text-exis-accent', bg: 'bg-exis-accent/5' }
         ].map((item, i) => (
           <div key={i} className="card-modern p-8 flex items-center gap-6 group">
@@ -147,7 +147,7 @@ export default function Dashboard() {
       {/* Project List */}
       <div className="card-modern overflow-hidden">
         <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <h3 className="text-xl font-black tracking-tight text-slate-800">Repositorio de Innovación</h3>
+          <h3 className="text-xl font-black tracking-tight text-slate-800">Proyectos inscritos</h3>
           <div className="relative w-full md:w-80">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
@@ -206,7 +206,7 @@ export default function Dashboard() {
                 <X size={24} />
               </button>
               <div className="inline-block px-4 py-1 bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
-                Expediente Técnico
+                Información detallada
               </div>
               <h2 className="text-4xl font-black tracking-tighter mb-2">{selectedProject.name}</h2>
               <p className="text-exis-secondary font-black uppercase tracking-[0.2em] text-xs">{selectedProject.category}</p>
@@ -230,7 +230,7 @@ export default function Dashboard() {
 
               <section>
                 <div className="flex items-center gap-4 mb-8">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Equipo de Innovación</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Integrantes</h3>
                   <div className="h-px w-full bg-slate-100"></div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -282,7 +282,7 @@ export default function Dashboard() {
                 onClick={() => setSelectedProject(null)}
                 className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-200 transition-all"
               >
-                Cerrar Expediente
+                Cerrar
               </button>
             </div>
           </div>
