@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
-import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Github, ExternalLink } from 'lucide-react';
+import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
 
 const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Fullstack'];
 
@@ -157,7 +157,7 @@ export default function RegistrationForm() {
             {/* GitHub Section */}
             <div className="space-y-4 p-6 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="flex items-center gap-2 text-slate-800 mb-2">
-                <Github size={20} />
+                <Code2 size={20} />
                 <h4 className="font-bold">Repositorio de GitHub</h4>
               </div>
               
