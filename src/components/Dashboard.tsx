@@ -215,16 +215,41 @@ export default function Dashboard() {
             <div className="p-10 overflow-y-auto space-y-12">
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2 space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Resumen del Proyecto</h3>
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Descripción del Proyecto</h3>
                   <p className="text-slate-600 leading-relaxed font-medium text-lg italic border-l-4 border-exis-secondary pl-6">"{selectedProject.description}"</p>
                 </div>
-                <div className="bg-slate-50 rounded-3xl p-6 flex flex-col justify-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 text-center">Impacto</p>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <div key={star} className="w-2 h-2 rounded-full bg-exis-secondary"></div>
-                    ))}
+                <div className="bg-slate-50 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 border-2 border-slate-100">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-800 shadow-sm">
+                    <Code2 size={24} />
                   </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Repositorio de Código</p>
+                    {selectedProject.github_repo ? (
+                      <a 
+                        href={selectedProject.github_repo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-exis-primary font-bold text-sm hover:text-exis-secondary transition-colors flex items-center gap-2"
+                      >
+                        Ver en GitHub <ExternalLink size={14} />
+                      </a>
+                    ) : (
+                      <p className="text-slate-400 text-xs font-bold italic">No registrado</p>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Categoría</h3>
+                  <p className="text-slate-800 font-black text-xl">{selectedProject.category}</p>
+                </div>
+                <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Estado</h3>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">
+                    Inscrito
+                  </span>
                 </div>
               </section>
 
