@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Project, Student } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, IdCard, Search, ArrowRight, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink } from 'lucide-react';
 
 const COLORS = ['#00594E', '#B5A160', '#36BCEE', '#6366F1', '#EC4899', '#F59E0B'];
 
