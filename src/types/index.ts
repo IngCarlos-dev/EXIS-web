@@ -14,5 +14,6 @@ export interface Project {
   name: string;
   description: string;
   category: Category;
+  github_repo?: string;
   students: Student[];
 }

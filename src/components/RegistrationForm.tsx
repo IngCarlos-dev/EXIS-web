@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
-import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
+import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Github, ExternalLink } from 'lucide-react';
 
 const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Fullstack'];
+
+const SUBJECTS = [
+  'Programación en Red y Multihilos',
+  'Computación Gráfica',
+  'Desarrollo de software II',
+  'Programación Orientada a Objetos I',
+  'Programación Orientada a Objetos II',
+  'Estructura de Datos',
+  'Inteligencia Artificial',
+  'Redes Neuronales',
+  'Mecatrónica I',
+  'Trabajo de Grado',
+  'Desarrollo Web',
+  'Otro'
+];
 
 export default function RegistrationForm() {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<Category>('Desarrollo web');
+  const [githubRepo, setGithubRepo] = useState('');
   const [students, setStudents] = useState<Student[]>([
     { document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }
   ]);
@@ -41,7 +57,12 @@ export default function RegistrationForm() {
     try {
       const { error: projectError } = await supabase
         .from('projects')
-        .insert([{ name: projectName, description, category }]);
+        .insert([{ 
+          name: projectName, 
+          description, 
+          category,
+          github_repo: githubRepo 
+        }]);
 
       if (projectError) {
         if (projectError.code === '23505') throw new Error('El nombre del proyecto ya está registrado.');
@@ -67,6 +88,7 @@ export default function RegistrationForm() {
       setProjectName('');
       setDescription('');
       setCategory('Desarrollo web');
+      setGithubRepo('');
       setStudents([{ document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
       
     } catch (err: any) {
@@ -81,12 +103,8 @@ export default function RegistrationForm() {
       <div className="card-modern overflow-hidden">
         <div className="bg-exis-primary p-10 text-white relative overflow-hidden">
           <div className="relative z-10">
-            <div className="flex items-center gap-2 text-exis-secondary mb-2">
-              <Sparkles size={18} />
-              <span className="text-xs font-black uppercase tracking-widest">Inscripciones Abiertas</span>
-            </div>
-            <h2 className="text-4xl font-black tracking-tighter">Inscripción de Proyecto</h2>
-            <p className="mt-2 text-white/70 font-medium">Completa los campos para asegurar tu lugar en EXIS 2026.</p>
+            <h2 className="text-4xl font-black tracking-tighter">Formulario de Inscripción</h2>
+            <p className="mt-2 text-white/70 font-medium">Completa los campos para registrar tu proyecto en EXIS 2026.</p>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
         </div>
@@ -96,7 +114,7 @@ export default function RegistrationForm() {
           <section className="space-y-8">
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded-full bg-exis-primary/10 flex items-center justify-center text-exis-primary font-black text-sm">1</div>
-              <h3 className="text-xl font-black tracking-tight text-slate-800">Detalles de la Innovación</h3>
+              <h3 className="text-xl font-black tracking-tight text-slate-800">Información del Proyecto</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -108,7 +126,7 @@ export default function RegistrationForm() {
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   className="input-modern"
-                  placeholder="Ej: EcoTrack AI"
+                  placeholder="Ej: Mi Gran Proyecto"
                 />
               </div>
               <div className="space-y-2">
@@ -124,6 +142,7 @@ export default function RegistrationForm() {
                 </select>
               </div>
             </div>
+
             <div className="space-y-2">
               <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 ml-1">Descripción</label>
               <textarea
@@ -131,8 +150,38 @@ export default function RegistrationForm() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="input-modern h-32 resize-none"
-                placeholder="Describe el impacto de tu proyecto..."
+                placeholder="Escribe de qué trata tu proyecto..."
               />
+            </div>
+
+            {/* GitHub Section */}
+            <div className="space-y-4 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-2 text-slate-800 mb-2">
+                <Github size={20} />
+                <h4 className="font-bold">Repositorio de GitHub</h4>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 ml-1">Enlace del repositorio</label>
+                <input
+                  type="url"
+                  value={githubRepo}
+                  onChange={(e) => setGithubRepo(e.target.value)}
+                  className="input-modern !bg-white"
+                  placeholder="https://github.com/usuario/proyecto"
+                />
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-xl space-y-2">
+                <p className="text-xs font-bold text-blue-800 flex items-center gap-2">
+                  <ExternalLink size={14} /> ¿Cómo subir tu proyecto?
+                </p>
+                <ul className="text-[11px] text-blue-700 space-y-1 list-disc ml-4">
+                  <li>Crea un repositorio en GitHub (público).</li>
+                  <li>Sube tus archivos usando Git o directamente en la web de GitHub.</li>
+                  <li>Copia el enlace de la barra de direcciones y pégalo aquí.</li>
+                </ul>
+              </div>
             </div>
           </section>
 
@@ -141,7 +190,7 @@ export default function RegistrationForm() {
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <div className="w-8 h-8 rounded-full bg-exis-primary/10 flex items-center justify-center text-exis-primary font-black text-sm">2</div>
-                <h3 className="text-xl font-black tracking-tight text-slate-800">Integrantes del Equipo</h3>
+                <h3 className="text-xl font-black tracking-tight text-slate-800">Integrantes</h3>
               </div>
               {students.length < 3 && (
                 <button
@@ -149,7 +198,7 @@ export default function RegistrationForm() {
                   onClick={addStudent}
                   className="group flex items-center gap-2 text-xs font-black uppercase tracking-widest text-exis-primary hover:text-exis-secondary transition-colors"
                 >
-                  <UserPlus size={16} className="transition-transform group-hover:scale-110" /> Agregar
+                  <UserPlus size={16} className="transition-transform group-hover:scale-110" /> Agregar integrante
                 </button>
               )}
             </div>
@@ -169,13 +218,13 @@ export default function RegistrationForm() {
                   
                   <div className="flex items-center gap-3 mb-6">
                     <div className="px-3 py-1 bg-white rounded-full text-[10px] font-black uppercase tracking-tighter text-exis-secondary shadow-sm">
-                      Materia Prima #{index + 1}
+                      Integrante #{index + 1}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nombre</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nombre completo</label>
                       <input
                         required
                         type="text"
@@ -185,7 +234,7 @@ export default function RegistrationForm() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Documento</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Documento de identidad</label>
                       <input
                         required
                         type="text"
@@ -205,7 +254,7 @@ export default function RegistrationForm() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Correo electrónico</label>
                       <input
                         required
                         type="email"
@@ -226,23 +275,53 @@ export default function RegistrationForm() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignatura 1</label>
-                      <input
+                      <select
                         required
-                        type="text"
                         value={student.subject1}
                         onChange={(e) => updateStudent(index, 'subject1', e.target.value)}
-                        className="input-modern !py-2.5 !bg-white"
-                      />
+                        className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
+                      >
+                        <option value="">Selecciona una materia</option>
+                        {SUBJECTS.map(sub => (
+                          <option key={sub} value={sub}>{sub}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignatura 2 (Opcional)</label>
-                      <input
-                        type="text"
+                      <select
                         value={student.subject2}
                         onChange={(e) => updateStudent(index, 'subject2', e.target.value)}
-                        className="input-modern !py-2.5 !bg-white"
-                      />
+                        className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
+                      >
+                        <option value="">Selecciona una materia</option>
+                        {SUBJECTS.map(sub => (
+                          <option key={sub} value={sub}>{sub}</option>
+                        ))}
+                      </select>
                     </div>
+                    
+                    {/* Extra input for "Otro" if selected */}
+                    {(student.subject1 === 'Otro' || student.subject2 === 'Otro') && (
+                      <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Especifique la materia</label>
+                        <input
+                          type="text"
+                          placeholder="Escribe el nombre de la materia si seleccionaste 'Otro'"
+                          className="input-modern !py-2.5 !bg-white"
+                          onChange={(e) => {
+                            // This is a bit tricky since we have subject1 and subject2.
+                            // If the user selects "Otro" in both, they might need two inputs,
+                            // but usually it's just one "Otro" or the same.
+                            // To keep it simple as requested, let's just let them type it.
+                            // However, subject1 and subject2 are separate fields.
+                            // Let's just use the value of the input to update the field that is "Otro".
+                            if (student.subject1 === 'Otro') updateStudent(index, 'subject1', e.target.value);
+                            else if (student.subject2 === 'Otro') updateStudent(index, 'subject2', e.target.value);
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -266,7 +345,7 @@ export default function RegistrationForm() {
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
               ) : (
                 <div className="flex items-center justify-center gap-3">
-                  <span>Confirmar Registro</span>
+                  <span>Registrar Proyecto</span>
                   <Send size={20} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                 </div>
               )}
