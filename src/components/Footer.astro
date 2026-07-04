@@ -1,0 +1,90 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<!-- Footer -->
+<footer class="bg-[#00594E] text-white py-12 border-t border-[#004A41]" aria-label="Pie de página institucional">
+    <style>
+        @media (min-width: 1024px) {
+            .custom-footer-grid {
+                grid-template-columns: 18fr 32fr 25fr 25fr;
+            }
+        }
+    </style>
+    <div class="w-full mx-auto px-6 md:px-8 xl:px-12 grid grid-cols-1 lg:grid-cols-4 gap-10 lg:gap-8 text-sm">
+
+        <!-- Bloque Co branding -->
+        <div class="flex flex-col gap-4 items-start">
+            <div class="flex flex-wrap gap-6 items-center bg-white/10 p-4 rounded-lg w-full justify-start mt-2">
+                <!-- GOV.CO Logo -->
+                <a href="https://www.gov.co" target="_blank" rel="noopener noreferrer"
+                    class="focus:outline-none focus:ring-2 focus:ring-white rounded transition-transform hover:scale-105"
+                    aria-label="Ir al portal único del Estado Colombiano, GOV.CO (abre en una nueva pestaña)">
+                    <img src="https://cdn.www.gov.co/assets/images/logo.png" alt="Logo GOV.CO" class="h-6 w-auto">
+                </a>
+                <!-- Marca Colombia Logo -->
+                <a href="https://www.colombia.co" target="_blank" rel="noopener noreferrer"
+                    class="focus:outline-none focus:ring-2 focus:ring-white rounded transition-transform hover:scale-105"
+                    aria-label="Ir al portal oficial de Marca País Colombia (abre en una nueva pestaña)">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Marca_pa%C3%ADs_Colombia_logo.svg/500px-Marca_pa%C3%ADs_Colombia_logo.svg.png"
+                        alt="Marca Colombia" class="h-10 w-auto">
+                </a>
+            </div>
+        </div>
+
+        <!-- Bloque 2 Información Institucional -->
+        <div class="flex flex-col gap-3">
+            <p class="font-bold text-white/90 drop-shadow-sm leading-relaxed">
+                Institución sujeta a inspección y vigilancia por el Ministerio de Educación Nacional de Colombia.
+            </p>
+            <p class="opacity-90 mt-2">
+                Derechos Reservados - <a href="https://www.unitropico.edu.co/" target="_blank"
+                    rel="noopener noreferrer"
+                    class="hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-[#00594E] focus:ring-offset-2 rounded transition-colors underline decoration-white/30"
+                    aria-label="Portal Principal de Unitrópico (abre en nueva pestaña)">Unitrópico</a> - Copyright ©️
+                <span id="year">{currentYear}</span>    
+            </p>
+            <p class="opacity-90 mt-1">
+                Designed by <a href="https://sistemasunitropico.com/" target="_blank" rel="noopener noreferrer"
+                    class="underline hover:text-[#B5A160] focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-[#00594E] focus:ring-offset-2 rounded transition-colors"
+                    aria-label="Ir al sitio web del Programa de Ingeniería de Sistemas (abre en nueva pestaña)">Programa
+                    de Ingeniería de Sistemas</a>.
+            </p>
+        </div>
+
+        <!-- Bloque 3 enlaces de Interés -->
+        <div class="flex flex-col gap-3">
+            <h2 class="font-bold text-lg text-white mb-2 border-b border-[#004A41] pb-2" id="footer-links-title">
+                Enlaces de Interés</h2>
+            <nav aria-labelledby="footer-links-title" class="flex flex-col gap-3">
+                <a href="https://www.unitropico.edu.co/" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-[#00594E] focus:ring-offset-2 rounded w-max transition-colors underline decoration-white/30"
+                    aria-label="Portal Principal de la Universidad (abre en nueva pestaña)">Portal Principal de la
+                    Universidad</a>
+
+                <a href="https://unitropico.edu.co/atencion-y-servicio-a-la-ciudadania/pqrs/" target="_blank"
+                    rel="noopener noreferrer"
+                    class="hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-[#00594E] focus:ring-offset-2 rounded w-max transition-colors underline decoration-white/30"
+                    aria-label="Ir al portal de Peticiones, quejas y reclamos de la Universidad (abre en una nueva pestaña)">Peticiones,
+                    quejas y reclamos</a>
+            </nav>
+        </div>
+
+        <!-- Bloque 4 datos de contacto y PQRS -->
+        <div class="flex flex-col gap-3">
+            <h2 class="font-bold text-lg text-white mb-2 border-b border-[#004A41] pb-2" id="footer-contact-title">
+                Contacto y Atención</h2>
+            <div aria-labelledby="footer-contact-title" class="flex flex-col gap-3 opacity-90">
+                <p class="leading-snug">Carrera 19 No. 39-40, Yopal, Casanare, Colombia.</p>
+                <p class="leading-snug">Lunes a Viernes de 8:00 a.m. a 12:00 m. y de 2:00 p.m. a 6:00 p.m.</p>
+
+                <div class="mt-1">
+                    <a href="https://unitropico.edu.co/conocenos-quienes-somos-y-filosofia-institucional-de-unitropico/contactanos-atencion-al-ciudadano-y-canales-de-contacto-con-unitropico/"
+                        target="_blank" rel="noopener noreferrer"
+                        class="text-[#B5A160] font-bold underline hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-[#00594E] focus:ring-offset-2 rounded transition-colors"
+                        aria-label="Líneas de contacto (abre en una nueva pestaña)">Líneas de contacto</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

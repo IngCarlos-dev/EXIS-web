@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
 import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
 
-const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Fullstack'];
+const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Libre'];
 
 const SUBJECTS = [
   'Programación en Red y Multihilos',
@@ -23,17 +23,18 @@ const SUBJECTS = [
 export default function RegistrationForm() {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
+  const [objective, setObjective] = useState('');
   const [category, setCategory] = useState<Category>('Desarrollo web');
   const [githubRepo, setGithubRepo] = useState('');
   const [students, setStudents] = useState<Student[]>([
-    { document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }
+    { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }
   ]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const addStudent = () => {
     if (students.length < 3) {
-      setStudents([...students, { document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
+      setStudents([...students, { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
     }
   };
 
@@ -55,11 +56,20 @@ export default function RegistrationForm() {
     setStatus(null);
 
     try {
+      // Validate unitropico.edu.co emails
+      for (let i = 0; i < students.length; i++) {
+        const email = students[i].email.trim().toLowerCase();
+        if (!email.endsWith('@unitropico.edu.co')) {
+          throw new Error(`El integrante #${i + 1} debe registrar un correo institucional de Unitrópico (@unitropico.edu.co).`);
+        }
+      }
+
       const { error: projectError } = await supabase
         .from('projects')
         .insert([{ 
           name: projectName, 
           description, 
+          objective,
           category,
           github_repo: githubRepo 
         }]);
@@ -87,9 +97,10 @@ export default function RegistrationForm() {
       setStatus({ type: 'success', message: '¡Proyecto registrado con éxito!' });
       setProjectName('');
       setDescription('');
+      setObjective('');
       setCategory('Desarrollo web');
       setGithubRepo('');
-      setStudents([{ document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
+      setStudents([{ document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
       
     } catch (err: any) {
       setStatus({ type: 'error', message: err.message || 'Error al registrar.' });
@@ -151,6 +162,17 @@ export default function RegistrationForm() {
                 onChange={(e) => setDescription(e.target.value)}
                 className="input-modern h-32 resize-none"
                 placeholder="Escribe de qué trata tu proyecto..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 ml-1">Objetivo del Proyecto</label>
+              <textarea
+                required
+                value={objective}
+                onChange={(e) => setObjective(e.target.value)}
+                className="input-modern h-24 resize-none"
+                placeholder="Escribe el objetivo general de tu proyecto..."
               />
             </div>
 
@@ -231,16 +253,34 @@ export default function RegistrationForm() {
                         value={student.name}
                         onChange={(e) => updateStudent(index, 'name', e.target.value)}
                         className="input-modern !py-2.5 !bg-white"
+                        placeholder="Ej: Juan Pérez"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Documento de identidad</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo de Documento</label>
+                      <select
+                        required
+                        value={student.document_type || 'CC'}
+                        onChange={(e) => updateStudent(index, 'document_type', e.target.value)}
+                        className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
+                      >
+                        <option value="CC">Cédula de Ciudadanía (CC)</option>
+                        <option value="CE">Cédula de Extranjería (CE)</option>
+                        <option value="TI">Tarjeta de Identidad (TI)</option>
+                        <option value="PAS">Pasaporte (PAS)</option>
+                        <option value="PEP">Permiso Especial de Permanencia (PEP)</option>
+                        <option value="PPT">Permiso por Protección Temporal (PPT)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Número de documento</label>
                       <input
                         required
                         type="text"
                         value={student.document_id}
                         onChange={(e) => updateStudent(index, 'document_id', e.target.value)}
                         className="input-modern !py-2.5 !bg-white"
+                        placeholder="Ej: 1002345678"
                       />
                     </div>
                     <div className="space-y-2">
@@ -251,6 +291,7 @@ export default function RegistrationForm() {
                         value={student.semester}
                         onChange={(e) => updateStudent(index, 'semester', e.target.value)}
                         className="input-modern !py-2.5 !bg-white"
+                        placeholder="Ej: 5"
                       />
                     </div>
                     <div className="space-y-2">
@@ -261,7 +302,9 @@ export default function RegistrationForm() {
                         value={student.email}
                         onChange={(e) => updateStudent(index, 'email', e.target.value)}
                         className="input-modern !py-2.5 !bg-white"
+                        placeholder="usuario@unitropico.edu.co"
                       />
+                      <p className="text-[9px] text-slate-400 font-semibold ml-1">Debe ser @unitropico.edu.co</p>
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Teléfono</label>
@@ -271,6 +314,7 @@ export default function RegistrationForm() {
                         value={student.phone}
                         onChange={(e) => updateStudent(index, 'phone', e.target.value)}
                         className="input-modern !py-2.5 !bg-white"
+                        placeholder="Ej: 3123456789"
                       />
                     </div>
                     <div className="space-y-2">

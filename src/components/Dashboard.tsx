@@ -214,9 +214,15 @@ export default function Dashboard() {
             
             <div className="p-10 overflow-y-auto space-y-12">
               <section className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <div className="lg:col-span-2 space-y-4">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Descripción del Proyecto</h3>
-                  <p className="text-slate-600 leading-relaxed font-medium text-lg italic border-l-4 border-exis-secondary pl-6">"{selectedProject.description}"</p>
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Descripción del Proyecto</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-lg italic border-l-4 border-exis-secondary pl-6">"{selectedProject.description}"</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Objetivo del Proyecto</h3>
+                    <p className="text-slate-600 leading-relaxed font-medium text-base border-l-4 border-exis-primary pl-6">{selectedProject.objective}</p>
+                  </div>
                 </div>
                 <div className="bg-slate-50 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 border-2 border-slate-100">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-800 shadow-sm">
@@ -274,7 +280,7 @@ export default function Dashboard() {
                       <div className="space-y-3 mb-6">
                         <div className="flex items-center gap-3 text-slate-500 text-xs font-bold">
                           <IdCard size={14} className="text-slate-300" />
-                          <span>{student.document_id}</span>
+                          <span>{student.document_type || 'CC'} - {student.document_id}</span>
                         </div>
                         <div className="flex items-center gap-3 text-slate-500 text-xs font-bold">
                           <Mail size={14} className="text-slate-300" />
