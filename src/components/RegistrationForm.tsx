@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
 import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
 
-const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Libre'];
+const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Fullstack'];
 
 const SUBJECTS = [
   'Programación en Red y Multihilos',
@@ -20,21 +20,28 @@ const SUBJECTS = [
   'Otro'
 ];
 
+interface StudentFormState extends Student {
+  isSubject1Otro?: boolean;
+  isSubject2Otro?: boolean;
+  subject1_custom?: string;
+  subject2_custom?: string;
+}
+
 export default function RegistrationForm() {
   const [projectName, setProjectName] = useState('');
   const [description, setDescription] = useState('');
   const [objective, setObjective] = useState('');
   const [category, setCategory] = useState<Category>('Desarrollo web');
   const [githubRepo, setGithubRepo] = useState('');
-  const [students, setStudents] = useState<Student[]>([
-    { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }
+  const [students, setStudents] = useState<StudentFormState[]>([
+    { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }
   ]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const addStudent = () => {
     if (students.length < 3) {
-      setStudents([...students, { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
+      setStudents([...students, { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
     }
   };
 
@@ -44,7 +51,7 @@ export default function RegistrationForm() {
     }
   };
 
-  const updateStudent = (index: number, field: keyof Student, value: string) => {
+  const updateStudent = (index: number, field: keyof StudentFormState, value: any) => {
     const newStudents = [...students];
     newStudents[index] = { ...newStudents[index], [field]: value };
     setStudents(newStudents);
@@ -79,7 +86,8 @@ export default function RegistrationForm() {
         throw projectError;
       }
 
-      const studentsToInsert = students.map(s => ({
+      // Remove local UI-only properties before sending to Supabase
+      const studentsToInsert = students.map(({ isSubject1Otro, isSubject2Otro, subject1_custom, subject2_custom, ...s }) => ({
         ...s,
         project_name: projectName
       }));
@@ -100,7 +108,7 @@ export default function RegistrationForm() {
       setObjective('');
       setCategory('Desarrollo web');
       setGithubRepo('');
-      setStudents([{ document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '' }]);
+      setStudents([{ document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
       
     } catch (err: any) {
       setStatus({ type: 'error', message: err.message || 'Error al registrar.' });
@@ -321,8 +329,17 @@ export default function RegistrationForm() {
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignatura 1</label>
                       <select
                         required
-                        value={student.subject1}
-                        onChange={(e) => updateStudent(index, 'subject1', e.target.value)}
+                        value={student.isSubject1Otro ? 'Otro' : student.subject1}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'Otro') {
+                            updateStudent(index, 'isSubject1Otro', true);
+                            updateStudent(index, 'subject1', student.subject1_custom || '');
+                          } else {
+                            updateStudent(index, 'isSubject1Otro', false);
+                            updateStudent(index, 'subject1', val);
+                          }
+                        }}
                         className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
                       >
                         <option value="">Selecciona una materia</option>
@@ -334,8 +351,17 @@ export default function RegistrationForm() {
                     <div className="space-y-2 md:col-span-2 lg:col-span-1">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignatura 2 (Opcional)</label>
                       <select
-                        value={student.subject2}
-                        onChange={(e) => updateStudent(index, 'subject2', e.target.value)}
+                        value={student.isSubject2Otro ? 'Otro' : student.subject2}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === 'Otro') {
+                            updateStudent(index, 'isSubject2Otro', true);
+                            updateStudent(index, 'subject2', student.subject2_custom || '');
+                          } else {
+                            updateStudent(index, 'isSubject2Otro', false);
+                            updateStudent(index, 'subject2', val);
+                          }
+                        }}
                         className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
                       >
                         <option value="">Selecciona una materia</option>
@@ -345,23 +371,39 @@ export default function RegistrationForm() {
                       </select>
                     </div>
                     
-                    {/* Extra input for "Otro" if selected */}
-                    {(student.subject1 === 'Otro' || student.subject2 === 'Otro') && (
+                    {/* Extra input for "Otro" if selected for Subject 1 */}
+                    {student.isSubject1Otro && (
                       <div className="space-y-2 md:col-span-2 lg:col-span-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Especifique la materia</label>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Especifique la materia (Asignatura 1)</label>
                         <input
+                          required
                           type="text"
-                          placeholder="Escribe el nombre de la materia si seleccionaste 'Otro'"
+                          value={student.subject1_custom || ''}
+                          placeholder="Escribe el nombre de la asignatura 1"
                           className="input-modern !py-2.5 !bg-white"
                           onChange={(e) => {
-                            // This is a bit tricky since we have subject1 and subject2.
-                            // If the user selects "Otro" in both, they might need two inputs,
-                            // but usually it's just one "Otro" or the same.
-                            // To keep it simple as requested, let's just let them type it.
-                            // However, subject1 and subject2 are separate fields.
-                            // Let's just use the value of the input to update the field that is "Otro".
-                            if (student.subject1 === 'Otro') updateStudent(index, 'subject1', e.target.value);
-                            else if (student.subject2 === 'Otro') updateStudent(index, 'subject2', e.target.value);
+                            const val = e.target.value;
+                            updateStudent(index, 'subject1_custom', val);
+                            updateStudent(index, 'subject1', val);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    {/* Extra input for "Otro" if selected for Subject 2 */}
+                    {student.isSubject2Otro && (
+                      <div className="space-y-2 md:col-span-2 lg:col-span-3">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Especifique la materia (Asignatura 2)</label>
+                        <input
+                          required
+                          type="text"
+                          value={student.subject2_custom || ''}
+                          placeholder="Escribe el nombre de la asignatura 2"
+                          className="input-modern !py-2.5 !bg-white"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            updateStudent(index, 'subject2_custom', val);
+                            updateStudent(index, 'subject2', val);
                           }}
                         />
                       </div>
