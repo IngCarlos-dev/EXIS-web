@@ -1,4 +1,4 @@
-export type Category = 'Desarrollo web' | 'Inteligencia Artificial' | 'Desarrollo Fullstack';
+export type Category = 'Desarrollo web' | 'Inteligencia Artificial' | 'Desarrollo Libre';
 
 export interface Student {
   document_type: string;

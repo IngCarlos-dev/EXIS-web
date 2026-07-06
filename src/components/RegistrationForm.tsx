@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
 import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
 
-const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Fullstack'];
+const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Libre'];
 
 const SUBJECTS = [
   'Programación en Red y Multihilos',
@@ -52,9 +52,11 @@ export default function RegistrationForm() {
   };
 
   const updateStudent = (index: number, field: keyof StudentFormState, value: any) => {
-    const newStudents = [...students];
-    newStudents[index] = { ...newStudents[index], [field]: value };
-    setStudents(newStudents);
+    setStudents(prev => {
+      const newStudents = [...prev];
+      newStudents[index] = { ...newStudents[index], [field]: value };
+      return newStudents;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
