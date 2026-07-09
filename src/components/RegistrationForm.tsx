@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
 import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
+import { generateReceiptPDF, generateSecurityHash } from '../lib/pdf/pdfGenerator';
 
 const CATEGORIES: Category[] = ['Desarrollo web', 'Inteligencia Artificial', 'Desarrollo Libre'];
 
@@ -20,6 +21,23 @@ const SUBJECTS = [
   'Otro'
 ];
 
+const TEACHERS = [
+  'Luis Miguel Piamonte Pardo',
+  'Cesar Dayan Martelo',
+  'Claudia Patricia Ochica Plazas',
+  'Jorge Enrique Chaparro',
+  'Fabián Alberto Ayala Lozano',
+  'Cristian Leandro Camargo Pinilla',
+  'Juan Carlos Fonseca',
+  'Julián Alberto Ramírez',
+  'Esteban Amezquita',
+  'Karen Lizeth Giraldo',
+  'Javier Aquilino Salcedo',
+  'Michael Arley Chaparro',
+  'Hernan Alberto Forero',
+  'Yesid Manuel Piamonte'
+];
+
 interface StudentFormState extends Student {
   isSubject1Otro?: boolean;
   isSubject2Otro?: boolean;
@@ -34,14 +52,14 @@ export default function RegistrationForm() {
   const [category, setCategory] = useState<Category>('Desarrollo web');
   const [githubRepo, setGithubRepo] = useState('');
   const [students, setStudents] = useState<StudentFormState[]>([
-    { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }
+    { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', teacher1: '', subject2: '', teacher2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }
   ]);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   const addStudent = () => {
     if (students.length < 3) {
-      setStudents([...students, { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
+      setStudents([...students, { document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', teacher1: '', subject2: '', teacher2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
     }
   };
 
@@ -73,6 +91,25 @@ export default function RegistrationForm() {
         }
       }
 
+      // Generate verification codes
+      const uniqueCode = `EXIS-2026-A-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      
+      const studentsForPDF = students.map(s => ({
+        document_id: s.document_id,
+        name: s.name,
+        semester: s.semester,
+        subject1: s.isSubject1Otro ? 'Otro' : s.subject1,
+        teacher1: s.teacher1,
+        subject2: s.subject2 ? (s.isSubject2Otro ? 'Otro' : s.subject2) : undefined,
+        teacher2: s.teacher2,
+        email: s.email,
+        phone: s.phone,
+        subject1_custom: s.subject1_custom,
+        subject2_custom: s.subject2_custom
+      }));
+
+      const securityHash = generateSecurityHash(projectName, studentsForPDF, uniqueCode);
+
       const { error: projectError } = await supabase
         .from('projects')
         .insert([{ 
@@ -80,7 +117,8 @@ export default function RegistrationForm() {
           description, 
           objective,
           category,
-          github_repo: githubRepo 
+          github_repo: githubRepo,
+          verification_code: securityHash
         }]);
 
       if (projectError) {
@@ -91,6 +129,7 @@ export default function RegistrationForm() {
       // Remove local UI-only properties before sending to Supabase
       const studentsToInsert = students.map(({ isSubject1Otro, isSubject2Otro, subject1_custom, subject2_custom, ...s }) => ({
         ...s,
+        teacher2: s.subject2 ? s.teacher2 : undefined,
         project_name: projectName
       }));
 
@@ -104,13 +143,16 @@ export default function RegistrationForm() {
         throw studentsError;
       }
 
-      setStatus({ type: 'success', message: '¡Proyecto registrado con éxito!' });
+      // Trigger automatic PDF download
+      generateReceiptPDF(projectName, category, description, githubRepo || undefined, studentsForPDF, uniqueCode);
+
+      setStatus({ type: 'success', message: '¡Proyecto registrado con éxito! Tu comprobante PDF se ha descargado automáticamente.' });
       setProjectName('');
       setDescription('');
       setObjective('');
       setCategory('Desarrollo web');
       setGithubRepo('');
-      setStudents([{ document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', subject2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
+      setStudents([{ document_type: 'CC', document_id: '', name: '', semester: '', subject1: '', teacher1: '', subject2: '', teacher2: '', email: '', phone: '', isSubject1Otro: false, isSubject2Otro: false, subject1_custom: '', subject2_custom: '' }]);
       
     } catch (err: any) {
       setStatus({ type: 'error', message: err.message || 'Error al registrar.' });
@@ -125,7 +167,7 @@ export default function RegistrationForm() {
         <div className="bg-exis-primary p-10 text-white relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-4xl font-black tracking-tighter">Formulario de Inscripción</h2>
-            <p className="mt-2 text-white/70 font-medium">Completa los campos para registrar tu proyecto en EXIS 2026.</p>
+            <p className="mt-2 text-white/70 font-medium">Completa los campos para registrar tu proyecto en EXIS 2026-A.</p>
           </div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
         </div>
@@ -350,7 +392,21 @@ export default function RegistrationForm() {
                         ))}
                       </select>
                     </div>
-                    <div className="space-y-2 md:col-span-2 lg:col-span-1">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Profesor Asignatura 1</label>
+                      <select
+                        required
+                        value={student.teacher1 || ''}
+                        onChange={(e) => updateStudent(index, 'teacher1', e.target.value)}
+                        className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
+                      >
+                        <option value="">Selecciona un profesor</option>
+                        {TEACHERS.map(prof => (
+                          <option key={prof} value={prof}>{prof}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignatura 2 (Opcional)</label>
                       <select
                         value={student.isSubject2Otro ? 'Otro' : student.subject2}
@@ -362,6 +418,9 @@ export default function RegistrationForm() {
                           } else {
                             updateStudent(index, 'isSubject2Otro', false);
                             updateStudent(index, 'subject2', val);
+                            if (!val) {
+                              updateStudent(index, 'teacher2', '');
+                            }
                           }
                         }}
                         className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
@@ -372,6 +431,22 @@ export default function RegistrationForm() {
                         ))}
                       </select>
                     </div>
+                    {student.subject2 && (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Profesor Asignatura 2</label>
+                        <select
+                          required
+                          value={student.teacher2 || ''}
+                          onChange={(e) => updateStudent(index, 'teacher2', e.target.value)}
+                          className="input-modern !py-2.5 !bg-white appearance-none cursor-pointer"
+                        >
+                          <option value="">Selecciona un profesor</option>
+                          {TEACHERS.map(prof => (
+                            <option key={prof} value={prof}>{prof}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                     
                     {/* Extra input for "Otro" if selected for Subject 1 */}
                     {student.isSubject1Otro && (
@@ -415,6 +490,22 @@ export default function RegistrationForm() {
               ))}
             </div>
           </section>
+
+          {/* Warning Banner */}
+          <div className="p-6 bg-amber-50 border border-amber-200 rounded-2xl space-y-3">
+            <h4 className="text-xs font-black text-amber-800 flex items-center gap-2">
+              <AlertCircle size={16} /> IMPORTANTE: DECLARACIÓN DE VERACIDAD E INSCRIPCIÓN
+            </h4>
+            <p className="text-[11px] text-amber-700 leading-relaxed font-semibold">
+              Al registrar el proyecto, los estudiantes declaran que la información suministrada es verídica. 
+              Inmediatamente después del registro se generará y descargará automáticamente un comprobante en PDF 
+              criptográficamente firmado (HASH) que servirá como soporte único ante la dirección del programa 
+              para garantizar su inscripción en EXIS 2026-A.
+            </p>
+            <p className="text-[11px] text-amber-800 font-bold">
+              ⚠️ Este PDF no se podrá volver a descargar desde el sistema. Asegúrese de guardarlo en un lugar seguro.
+            </p>
+          </div>
 
           {status && (
             <div className={`p-6 rounded-2xl flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500 ${status.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>

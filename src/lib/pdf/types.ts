@@ -1,7 +1,6 @@
-export type Category = 'Desarrollo web' | 'Inteligencia Artificial' | 'Desarrollo Libre';
+export type Category = 'Desarrollo web' | 'Inteligencia Artificial' | 'Desarrollo Fullstack' | 'Desarrollo Libre';
 
 export interface Student {
-  document_type: string;
   document_id: string;
   name: string;
   semester: string;
@@ -11,6 +10,8 @@ export interface Student {
   teacher2?: string;
   email: string;
   phone: string;
+  subject1_custom?: string;
+  subject2_custom?: string;
 }
 
 export interface Project {
@@ -18,6 +19,5 @@ export interface Project {
   description: string;
   category: Category;
   github_repo?: string;
-  objective: string;
   students: Student[];
 }
