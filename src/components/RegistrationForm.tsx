@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CountdownTimer from './CountdownTimer';
 import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
 import { UserPlus, UserMinus, Send, CheckCircle2, AlertCircle, Sparkles, Code2, ExternalLink } from 'lucide-react';
@@ -83,12 +84,22 @@ export default function RegistrationForm() {
     setStatus(null);
 
     try {
+      if (!githubRepo.trim()) {
+        throw new Error('El enlace del repositorio de GitHub es obligatorio.');
+      }
+
       // Validate unitropico.edu.co emails
       for (let i = 0; i < students.length; i++) {
         const email = students[i].email.trim().toLowerCase();
         if (!email.endsWith('@unitropico.edu.co')) {
           throw new Error(`El integrante #${i + 1} debe registrar un correo institucional de Unitrópico (@unitropico.edu.co).`);
         }
+      }
+
+      // Validate distinct document IDs in the same project registration
+      const docIds = students.map(s => s.document_id.trim());
+      if (new Set(docIds).size !== docIds.length) {
+        throw new Error('No puedes ingresar el mismo número de documento para varios integrantes del mismo proyecto.');
       }
 
       // Generate verification codes
@@ -139,7 +150,7 @@ export default function RegistrationForm() {
 
       if (studentsError) {
         await supabase.from('projects').delete().eq('name', projectName);
-        if (studentsError.code === '23505') throw new Error('Uno de los documentos de identidad ya está registrado.');
+        if (studentsError.code === '23505') throw new Error('Ocurrió un error de duplicado al registrar los integrantes.');
         throw studentsError;
       }
 
@@ -163,6 +174,7 @@ export default function RegistrationForm() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-12">
+      <CountdownTimer />
       <div className="card-modern overflow-hidden">
         <div className="bg-exis-primary p-10 text-white relative overflow-hidden">
           <div className="relative z-10">
@@ -236,8 +248,11 @@ export default function RegistrationForm() {
               </div>
               
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 ml-1">Enlace del repositorio</label>
+                <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 ml-1">
+                  Enlace del repositorio <span className="text-red-500 font-bold">*</span>
+                </label>
                 <input
+                  required
                   type="url"
                   value={githubRepo}
                   onChange={(e) => setGithubRepo(e.target.value)}
