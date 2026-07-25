@@ -288,7 +288,22 @@ export default function Dashboard() {
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
 
-    return { totalProjects, categoryData, subjectData };
+    const teacherMap: Record<string, number> = {};
+    projects.forEach(p => {
+      const teachersInProject = new Set<string>();
+      p.students.forEach(s => {
+        if (s.teacher1 && s.teacher1.trim()) teachersInProject.add(s.teacher1.trim());
+        if (s.teacher2 && s.teacher2.trim()) teachersInProject.add(s.teacher2.trim());
+      });
+      teachersInProject.forEach(teacher => {
+        teacherMap[teacher] = (teacherMap[teacher] || 0) + 1;
+      });
+    });
+    const teacherData = Object.entries(teacherMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+
+    return { totalProjects, categoryData, subjectData, teacherData };
   }, [projects]);
 
   // PUBLIC/LOGIN INTERFACE (Unauthenticated)
@@ -477,7 +492,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="card-modern p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-lg font-black tracking-tight text-slate-800">Distribución de Categorías</h3>
@@ -523,6 +538,43 @@ export default function Dashboard() {
                 <Bar dataKey="value" fill="#B5A160" radius={[0, 8, 8, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="card-modern p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-black tracking-tight text-slate-800">Proyectos por Profesor</h3>
+            <div className="p-2 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 px-3 uppercase tracking-widest">Docentes</div>
+          </div>
+          <div className="h-72">
+            {stats.teacherData.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-slate-400 font-medium text-xs">
+                Sin profesores registrados
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.teacherData} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+                  <XAxis type="number" hide allowDecimals={false} />
+                  <YAxis 
+                    dataKey="name" 
+                    type="category" 
+                    fontSize={10} 
+                    width={110} 
+                    tick={{ fontWeight: 700, fill: '#64748B' }} 
+                    axisLine={false} 
+                    tickLine={false}
+                    tickFormatter={(val: string) => val.length > 16 ? `${val.slice(0, 14)}...` : val}
+                  />
+                  <Tooltip 
+                    cursor={{ fill: '#F8FAFC' }} 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
+                    formatter={(value: any) => [`${value} proyecto(s)`, 'Proyectos']}
+                  />
+                  <Bar dataKey="value" fill="#00594E" radius={[0, 8, 8, 0]} barSize={24} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
