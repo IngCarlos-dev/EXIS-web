@@ -79,17 +79,35 @@ export default function Dashboard() {
 
   const toggleRegistration = async () => {
     const newValue = !isRegistrationClosed;
-    const { error } = await supabase
+    
+    // Primero intentamos actualizar
+    const { data, error: updateError } = await supabase
       .from('settings')
-      .upsert({ key: 'is_registration_closed', value: newValue });
+      .update({ value: newValue })
+      .eq('key', 'is_registration_closed')
+      .select();
       
-    if (!error) {
-      setIsRegistrationClosed(newValue);
-      showToast(`Inscripciones ${newValue ? 'CERRADAS' : 'ABIERTAS'} exitosamente.`, 'success');
-    } else {
-      showToast('Error al actualizar el estado.', 'error');
-      console.error(error);
+    if (updateError) {
+      showToast(`Error: ${updateError.message}`, 'error');
+      console.error(updateError);
+      return;
     }
+
+    // Si data.length es 0, significa que la fila no existe. Debemos insertarla.
+    if (data && data.length === 0) {
+      const { error: insertError } = await supabase
+        .from('settings')
+        .insert({ key: 'is_registration_closed', value: newValue });
+        
+      if (insertError) {
+        showToast(`Error (Insert): ${insertError.message}`, 'error');
+        console.error(insertError);
+        return;
+      }
+    }
+
+    setIsRegistrationClosed(newValue);
+    showToast(`Inscripciones ${newValue ? 'CERRADAS' : 'ABIERTAS'} exitosamente.`, 'success');
   };
 
   // Edit Mode States
