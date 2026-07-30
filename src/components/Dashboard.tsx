@@ -1,3 +1,4 @@
+// Panel de Administrador - Rediseñado
 import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Project, Student } from '../types';
