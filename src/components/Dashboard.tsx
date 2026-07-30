@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, 
   IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink, Lock, 
-  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List
+  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List, Plus
 } from 'lucide-react';
 
 const COLORS = ['#00594E', '#B5A160', '#36BCEE', '#6366F1', '#EC4899', '#F59E0B'];
@@ -579,7 +579,13 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <div className="p-4 border-t border-slate-100">
+        <div className="p-4 border-t border-slate-100 space-y-2">
+          <a 
+            href="/"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all duration-200 active:scale-[0.98] shadow-sm shadow-emerald-600/20 group"
+          >
+            <Plus size={16} className="transition-transform group-hover:rotate-90" /> Nuevo Proyecto
+          </a>
           <button 
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-colors duration-200 active:scale-[0.98] shadow-sm"
@@ -600,6 +606,7 @@ export default function Dashboard() {
             <h2 className="font-black text-slate-800 text-base">Admin Panel</h2>
           </div>
           <div className="flex gap-2">
+            <a href="/" className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-colors" title="Nuevo Proyecto"><Plus size={18} /></a>
             <button onClick={() => setActiveTab('overview')} className={`p-2 rounded-lg ${activeTab === 'overview' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><LayoutDashboard size={18} /></button>
             <button onClick={() => setActiveTab('projects')} className={`p-2 rounded-lg ${activeTab === 'projects' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><List size={18} /></button>
             <button onClick={() => setActiveTab('settings')} className={`p-2 rounded-lg ${activeTab === 'settings' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><Settings size={18} /></button>
