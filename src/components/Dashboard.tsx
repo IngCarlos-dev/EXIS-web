@@ -331,9 +331,11 @@ export default function Dashboard() {
   // Compute stats for admin
   const stats = useMemo(() => {
     const totalProjects = projects.length;
+    let totalStudents = 0;
     
     const categoryMap: Record<string, number> = {};
     projects.forEach(p => {
+      totalStudents += p.students.length;
       categoryMap[p.category] = (categoryMap[p.category] || 0) + 1;
     });
     const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
@@ -365,7 +367,10 @@ export default function Dashboard() {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
 
-    return { totalProjects, categoryData, subjectData, teacherData };
+    const totalTeachers = teacherData.length;
+    const avgStudents = totalProjects > 0 ? (totalStudents / totalProjects).toFixed(1) : '0';
+
+    return { totalProjects, totalStudents, totalTeachers, avgStudents, categoryData, subjectData, teacherData };
   }, [projects]);
 
   // PUBLIC/LOGIN INTERFACE (Unauthenticated)
@@ -593,19 +598,20 @@ export default function Dashboard() {
               </div>
 
               {/* Overview Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 {[
-                  { label: 'Proyectos Registrados', value: stats.totalProjects, icon: LayoutDashboard, color: 'text-exis-primary', bg: 'bg-exis-primary/10' },
-                  { label: 'Total Participantes', value: projects.reduce((acc, p) => acc + p.students.length, 0), icon: Users, color: 'text-exis-secondary', bg: 'bg-exis-secondary/10' },
-                  { label: 'Categorías Activas', value: stats.categoryData.length, icon: Briefcase, color: 'text-exis-accent', bg: 'bg-exis-accent/10' }
+                  { label: 'Proyectos Registrados', value: stats.totalProjects, icon: LayoutDashboard, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+                  { label: 'Total Participantes', value: stats.totalStudents, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+                  { label: 'Docentes Asignados', value: stats.totalTeachers, icon: GraduationCap, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+                  { label: 'Promedio Alumnos', value: stats.avgStudents, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' }
                 ].map((item, i) => (
-                  <div key={i} className="bg-white rounded-3xl p-6 flex items-center gap-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div className={`p-4 ${item.bg} ${item.color} rounded-2xl`}>
-                      <item.icon size={24} />
+                  <div key={i} className={`bg-white rounded-3xl p-5 md:p-6 flex flex-col xl:flex-row items-start xl:items-center gap-4 xl:gap-5 border shadow-sm hover:shadow-md transition-all ${item.border}`}>
+                    <div className={`p-3 md:p-4 ${item.bg} ${item.color} rounded-2xl shrink-0`}>
+                      <item.icon size={24} className="md:w-6 md:h-6 w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{item.label}</p>
-                      <p className="text-3xl font-black text-slate-800 tracking-tighter leading-none">{item.value}</p>
+                      <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{item.label}</p>
+                      <p className="text-2xl md:text-3xl font-black text-slate-800 tracking-tighter leading-none">{item.value}</p>
                     </div>
                   </div>
                 ))}
