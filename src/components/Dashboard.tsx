@@ -732,9 +732,16 @@ export default function Dashboard() {
                         </tr>
                       ) : (
                         filteredProjects.map((project) => (
-                          <tr key={project.name} className="hover:bg-slate-50/50 transition-colors">
+                          <tr 
+                            key={project.name} 
+                            onClick={() => {
+                              setSelectedProject(project);
+                              setIsEditing(false);
+                            }}
+                            className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
+                          >
                             <td className="px-6 py-4">
-                              <div className="font-bold text-slate-800 truncate max-w-xs">{project.name}</div>
+                              <div className="font-bold text-slate-800 truncate max-w-xs group-hover:text-exis-primary transition-colors">{project.name}</div>
                               <div className="text-[10px] font-medium text-slate-400 truncate max-w-xs">{project.description}</div>
                             </td>
                             <td className="px-6 py-4">
@@ -745,7 +752,7 @@ export default function Dashboard() {
                             <td className="px-6 py-4">
                               <div className="flex -space-x-2">
                                 {project.students.map((stud, i) => (
-                                  <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[9px] font-black text-slate-500 relative group cursor-default">
+                                  <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[9px] font-black text-slate-500 relative group-hover:bg-slate-300 transition-colors">
                                     {stud.name.charAt(0)}
                                     {/* Tooltip on hover */}
                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap">
@@ -757,11 +764,7 @@ export default function Dashboard() {
                             </td>
                             <td className="px-6 py-4">
                               <button
-                                onClick={() => {
-                                  setSelectedProject(project);
-                                  setIsEditing(false);
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-exis-primary/10 hover:bg-exis-primary/20 text-exis-primary font-bold text-[10px] uppercase tracking-wider rounded-lg transition-colors"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-exis-primary/10 group-hover:bg-exis-primary group-hover:text-white text-exis-primary font-bold text-[10px] uppercase tracking-wider rounded-lg transition-colors"
                               >
                                 <Edit size={12} /> Ver / Editar
                               </button>
