@@ -70,19 +70,25 @@ export default function Dashboard() {
 
   // Registration Status
   const [isRegistrationClosed, setIsRegistrationClosed] = useState(true);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const toggleRegistration = async () => {
     const newValue = !isRegistrationClosed;
     const { error } = await supabase
       .from('settings')
-      .update({ value: newValue })
-      .eq('key', 'is_registration_closed');
+      .upsert({ key: 'is_registration_closed', value: newValue });
       
     if (!error) {
       setIsRegistrationClosed(newValue);
-      alert(`Inscripciones ${newValue ? 'CERRADAS' : 'ABIERTAS'} exitosamente.`);
+      showToast(`Inscripciones ${newValue ? 'CERRADAS' : 'ABIERTAS'} exitosamente.`, 'success');
     } else {
-      alert('Error al actualizar el estado. Por favor verifica que la tabla settings exista en Supabase.');
+      showToast('Error al actualizar el estado.', 'error');
+      console.error(error);
     }
   };
 
@@ -259,9 +265,9 @@ export default function Dashboard() {
       } else {
         setSelectedProject(null);
       }
-      alert('¡Proyecto actualizado con éxito!');
+      showToast('¡Proyecto actualizado con éxito!', 'success');
     } catch (err: any) {
-      alert('Error al actualizar el proyecto: ' + err.message);
+      showToast('Error al actualizar el proyecto: ' + err.message, 'error');
     }
   };
 
@@ -290,9 +296,9 @@ export default function Dashboard() {
 
       setSelectedProject(null);
       await fetchData();
-      alert('Proyecto eliminado con éxito.');
+      showToast('Proyecto eliminado con éxito.', 'success');
     } catch (err: any) {
-      alert('Error al eliminar el proyecto: ' + err.message);
+      showToast('Error al eliminar el proyecto: ' + err.message, 'error');
     }
   };
 
@@ -517,9 +523,10 @@ export default function Dashboard() {
           </div>
 
           {/* Logout Button */}
+          <div className="hidden sm:block w-px h-8 bg-emerald-200 mx-1"></div>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-1.5 text-xs font-black text-rose-600 hover:text-rose-700 uppercase tracking-wider transition-colors ml-2 sm:ml-4 sm:border-l sm:border-emerald-200 sm:pl-4"
+            className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
           >
             <LogOut size={14} /> Cerrar Sesión
           </button>
@@ -1120,6 +1127,17 @@ export default function Dashboard() {
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300 ${toast.type === 'success' ? 'bg-emerald-900 text-emerald-50' : 'bg-rose-900 text-rose-50'}`}>
+          {toast.type === 'success' ? <CheckCircle2 size={20} className="text-emerald-400" /> : <AlertTriangle size={20} className="text-rose-400" />}
+          <span className="font-bold text-sm">{toast.message}</span>
+          <button onClick={() => setToast(null)} className="ml-4 opacity-70 hover:opacity-100 transition-opacity">
+            <X size={16} />
+          </button>
         </div>
       )}
     </div>
