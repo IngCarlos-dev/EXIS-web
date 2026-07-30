@@ -618,53 +618,53 @@ export default function Dashboard() {
               </div>
 
               {/* Charts Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm xl:col-span-1">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-base font-black tracking-tight text-slate-800">Por Categorías</h3>
                     <TrendingUp size={16} className="text-slate-400" />
                   </div>
-                  <div className="h-64">
+                  <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
-                        <Pie data={stats.categoryData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                        <Pie data={stats.categoryData} cx="50%" cy="50%" innerRadius="60%" outerRadius="80%" paddingAngle={5} dataKey="value">
                           {stats.categoryData.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="outline-none" />
                           ))}
                         </Pie>
                         <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }} />
-                        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }} />
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm xl:col-span-1">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-base font-black tracking-tight text-slate-800">Proyectos por Asignatura</h3>
-                    <div className="px-2 py-1 bg-slate-50 rounded text-[9px] font-black text-slate-400 uppercase tracking-widest">Top 5</div>
+                    <div className="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-100">Top 5</div>
                   </div>
-                  <div className="h-64">
+                  <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={stats.subjectData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
                         <XAxis type="number" hide />
-                        <YAxis dataKey="name" type="category" fontSize={10} width={130} tick={{ fontWeight: 700, fill: '#64748B' }} axisLine={false} tickLine={false} tickFormatter={(val: string) => val.length > 20 ? `${val.slice(0, 18)}...` : val} />
+                        <YAxis dataKey="name" type="category" fontSize={11} width={140} tick={{ fontWeight: 700, fill: '#64748B' }} axisLine={false} tickLine={false} tickFormatter={(val: string) => val.length > 22 ? `${val.slice(0, 20)}...` : val} />
                         <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
-                        <Bar dataKey="value" fill="#B5A160" radius={[0, 6, 6, 0]} barSize={20} />
+                        <Bar dataKey="value" fill="#B5A160" radius={[0, 6, 6, 0]} barSize={24} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm xl:col-span-2">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-base font-black tracking-tight text-slate-800">Proyectos por Profesor</h3>
-                    <div className="px-2 py-1 bg-slate-50 rounded text-[9px] font-black text-slate-400 uppercase tracking-widest">Docentes</div>
+                    <div className="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-black text-slate-500 uppercase tracking-widest border border-slate-100">Docentes</div>
                   </div>
-                  <div className="h-64">
+                  <div className="h-96">
                     {stats.teacherData.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-slate-400 font-medium text-xs">
+                      <div className="h-full flex items-center justify-center text-slate-400 font-medium text-sm bg-slate-50/50 rounded-2xl border border-slate-100/50">
                         Sin profesores registrados
                       </div>
                     ) : (
@@ -675,19 +675,18 @@ export default function Dashboard() {
                           <YAxis 
                             dataKey="name" 
                             type="category" 
-                            fontSize={10} 
-                            width={110} 
+                            fontSize={11} 
+                            width={160} 
                             tick={{ fontWeight: 700, fill: '#64748B' }} 
                             axisLine={false} 
                             tickLine={false}
-                            tickFormatter={(val: string) => val.length > 16 ? `${val.slice(0, 14)}...` : val}
                           />
                           <Tooltip 
                             cursor={{ fill: '#F8FAFC' }} 
-                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
                             formatter={(value: any) => [`${value} proyecto(s)`, 'Proyectos']}
                           />
-                          <Bar dataKey="value" fill="#00594E" radius={[0, 6, 6, 0]} barSize={20} />
+                          <Bar dataKey="value" fill="#00594E" radius={[0, 6, 6, 0]} barSize={24} />
                         </BarChart>
                       </ResponsiveContainer>
                     )}
@@ -758,10 +757,10 @@ export default function Dashboard() {
                             <td className="px-6 py-4">
                               <div className="flex -space-x-2">
                                 {project.students.map((stud, i) => (
-                                  <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[9px] font-black text-slate-500 relative group-hover:bg-slate-300 transition-colors">
+                                  <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[9px] font-black text-slate-500 relative group/stud hover:bg-slate-300 transition-colors">
                                     {stud.name.charAt(0)}
                                     {/* Tooltip on hover */}
-                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap">
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover/stud:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap">
                                       {stud.name}
                                     </div>
                                   </div>
