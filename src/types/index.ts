@@ -20,4 +20,5 @@ export interface Project {
   github_repo?: string;
   objective: string;
   students: Student[];
+  status?: 'Inscrito' | 'Aprobado' | 'Rechazado';
 }

@@ -322,6 +322,26 @@ export default function Dashboard() {
     }
   };
 
+  // Update Project Status
+  const updateProjectStatus = async (status: 'Aprobado' | 'Rechazado') => {
+    if (!selectedProject) return;
+
+    try {
+      const { error: projErr } = await supabase
+        .from('projects')
+        .update({ status: status })
+        .eq('name', selectedProject.name);
+
+      if (projErr) throw projErr;
+
+      setSelectedProject(null);
+      await fetchData();
+      showToast(`Proyecto marcado como ${status} con éxito.`, 'success');
+    } catch (err: any) {
+      showToast('Error al actualizar el estado: ' + err.message, 'error');
+    }
+  };
+
   // Filtered list for admin
   const filteredProjects = projects.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1146,8 +1166,14 @@ export default function Dashboard() {
                     </div>
                     <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                       <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Estado</h3>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">
-                        Inscrito
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        !selectedProject.status || selectedProject.status === 'Inscrito' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : selectedProject.status === 'Aprobado'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-rose-100 text-rose-700'
+                      }`}>
+                        {selectedProject.status || 'Inscrito'}
                       </span>
                     </div>
                   </section>
@@ -1215,14 +1241,29 @@ export default function Dashboard() {
             
             {/* Modal Footer (with controls) */}
             <div className="p-6 md:p-8 bg-slate-50/50 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4 flex-shrink-0">
-              <div>
+              <div className="flex flex-wrap gap-2 md:gap-4 items-center">
                 {!isEditing && (
-                  <button
-                    onClick={deleteProject}
-                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
-                  >
-                    <Trash2 size={14} /> Eliminar Proyecto
-                  </button>
+                  <>
+                    <button
+                      onClick={deleteProject}
+                      className="flex items-center gap-2 px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                    >
+                      <Trash2 size={14} /> Eliminar
+                    </button>
+                    <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
+                    <button
+                      onClick={() => updateProjectStatus('Aprobado')}
+                      className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                    >
+                      <CheckCircle2 size={14} /> Aprobar
+                    </button>
+                    <button
+                      onClick={() => updateProjectStatus('Rechazado')}
+                      className="flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                    >
+                      <X size={14} /> Rechazar
+                    </button>
+                  </>
                 )}
               </div>
               <div className="flex gap-4">
