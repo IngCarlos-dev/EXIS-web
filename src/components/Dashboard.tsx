@@ -518,7 +518,7 @@ export default function Dashboard() {
 
   // ADMIN DASHBOARD VIEW
   return (
-    <div className="flex h-[calc(100vh-2rem)] md:h-screen -mx-4 sm:-mx-8 lg:-mx-12 -mt-12 bg-slate-50 animate-in fade-in duration-700 overflow-hidden text-slate-800">
+    <div className="flex h-[100dvh] w-full fixed inset-0 z-50 bg-slate-50 animate-in fade-in duration-700 overflow-hidden text-slate-800">
       
       {/* Sidebar Navigation */}
       <div className="w-64 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex shrink-0">
@@ -825,7 +825,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-[32px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col scale-in duration-300 my-auto">
             
             {/* Modal Header */}
-            <div className="p-10 bg-exis-primary text-white relative flex-shrink-0">
+            <div className="p-6 md:p-10 bg-exis-primary text-white relative flex-shrink-0">
               <button
                 onClick={() => {
                   setSelectedProject(null);
@@ -873,7 +873,7 @@ export default function Dashboard() {
             </div>
             
             {/* Modal Body */}
-            <div className="p-10 overflow-y-auto flex-grow space-y-12">
+            <div className="p-6 md:p-10 overflow-y-auto flex-grow space-y-12">
               {isEditing ? (
                 // EDIT MODE BODY
                 <div className="space-y-8">
@@ -1206,7 +1206,7 @@ export default function Dashboard() {
             </div>
             
             {/* Modal Footer (with controls) */}
-            <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4 flex-shrink-0">
+            <div className="p-6 md:p-8 bg-slate-50/50 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4 flex-shrink-0">
               <div>
                 {!isEditing && (
                   <button
