@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { 
   LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, 
   IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink, Lock, 
-  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save 
+  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List
 } from 'lucide-react';
 
 const COLORS = ['#00594E', '#B5A160', '#36BCEE', '#6366F1', '#EC4899', '#F59E0B'];
@@ -71,6 +71,7 @@ export default function Dashboard() {
   // Registration Status
   const [isRegistrationClosed, setIsRegistrationClosed] = useState(true);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'projects' | 'settings'>('overview');
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -516,200 +517,266 @@ export default function Dashboard() {
 
   // ADMIN DASHBOARD VIEW
   return (
-    <div className="space-y-12 animate-in fade-in duration-700">
+    <div className="flex h-[calc(100vh-2rem)] md:h-screen -mx-4 sm:-mx-8 lg:-mx-12 -mt-12 bg-slate-50 animate-in fade-in duration-700 overflow-hidden text-slate-800">
       
-      {/* Admin Logged-In Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl gap-4">
-        <div className="flex items-center gap-2 text-emerald-700">
-          <CheckCircle2 size={16} />
-          <span className="text-xs font-bold">Sesión Administrativa Activa</span>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {/* Toggle Button */}
-          <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-emerald-100 shadow-sm">
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Inscripciones:</span>
-            <button 
-              onClick={toggleRegistration}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${!isRegistrationClosed ? 'bg-emerald-500' : 'bg-rose-500'}`}
-            >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!isRegistrationClosed ? 'translate-x-6' : 'translate-x-1'}`} />
-            </button>
-            <span className={`text-[10px] font-black uppercase tracking-widest ${!isRegistrationClosed ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {!isRegistrationClosed ? 'Abiertas' : 'Cerradas'}
-            </span>
+      {/* Sidebar Navigation */}
+      <div className="w-64 bg-white border-r border-slate-200 flex-col justify-between hidden md:flex shrink-0">
+        <div>
+          <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+            <div className="w-10 h-10 bg-exis-primary rounded-xl flex items-center justify-center text-white shadow-sm">
+              <CheckCircle2 size={20} />
+            </div>
+            <div>
+              <h2 className="font-black text-slate-800 text-lg tracking-tight leading-none">Admin Panel</h2>
+              <p className="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-1">EXIS 2026-A</p>
+            </div>
           </div>
-
-          {/* Logout Button */}
-          <div className="hidden sm:block w-px h-8 bg-emerald-200 mx-1"></div>
+          <div className="p-4 space-y-2">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'overview' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+              <LayoutDashboard size={18} /> Resumen
+            </button>
+            <button
+              onClick={() => setActiveTab('projects')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'projects' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+              <List size={18} /> Proyectos
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'settings' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+              <Settings size={18} /> Configuraciones
+            </button>
+          </div>
+        </div>
+        <div className="p-4 border-t border-slate-100">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-all shadow-sm"
           >
-            <LogOut size={14} /> Cerrar Sesión
+            <LogOut size={16} /> Cerrar Sesión
           </button>
         </div>
       </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          { label: 'Proyectos', value: stats.totalProjects, icon: LayoutDashboard, color: 'text-exis-primary', bg: 'bg-exis-primary/5' },
-          { label: 'Participantes', value: projects.reduce((acc, p) => acc + p.students.length, 0), icon: Users, color: 'text-exis-secondary', bg: 'bg-exis-secondary/5' },
-          { label: 'Categorías', value: stats.categoryData.length, icon: Briefcase, color: 'text-exis-accent', bg: 'bg-exis-accent/5' }
-        ].map((item, i) => (
-          <div key={i} className="card-modern p-8 flex items-center gap-6 group">
-            <div className={`p-4 ${item.bg} ${item.color} rounded-2xl transition-transform group-hover:scale-110 duration-300`}>
-              <item.icon size={28} />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* Mobile Header */}
+        <div className="md:hidden p-4 bg-white border-b border-slate-200 flex justify-between items-center z-10 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-exis-primary rounded-lg flex items-center justify-center text-white">
+              <CheckCircle2 size={16} />
             </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{item.label}</p>
-              <p className="text-3xl font-black text-slate-800 tracking-tighter">{item.value}</p>
-            </div>
+            <h2 className="font-black text-slate-800 text-base">Admin Panel</h2>
           </div>
-        ))}
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="card-modern p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black tracking-tight text-slate-800">Distribución de Categorías</h3>
-            <div className="p-2 bg-slate-50 rounded-lg"><TrendingUp size={16} className="text-slate-400" /></div>
-          </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats.categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={100}
-                  paddingAngle={8}
-                  dataKey="value"
-                >
-                  {stats.categoryData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="outline-none" />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
-                />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }} />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="flex gap-2">
+            <button onClick={() => setActiveTab('overview')} className={`p-2 rounded-lg ${activeTab === 'overview' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><LayoutDashboard size={18} /></button>
+            <button onClick={() => setActiveTab('projects')} className={`p-2 rounded-lg ${activeTab === 'projects' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><List size={18} /></button>
+            <button onClick={() => setActiveTab('settings')} className={`p-2 rounded-lg ${activeTab === 'settings' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><Settings size={18} /></button>
+            <button onClick={handleLogout} className="p-2 rounded-lg bg-rose-50 text-rose-600"><LogOut size={18} /></button>
           </div>
         </div>
 
-        <div className="card-modern p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black tracking-tight text-slate-800">Top Asignaturas</h3>
-            <div className="p-2 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 px-3 uppercase tracking-widest">Participación</div>
-          </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.subjectData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
-                <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" fontSize={10} width={100} tick={{ fontWeight: 700, fill: '#64748B' }} axisLine={false} tickLine={false} />
-                <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="value" fill="#B5A160" radius={[0, 8, 8, 0]} barSize={24} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="card-modern p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-black tracking-tight text-slate-800">Proyectos por Profesor</h3>
-            <div className="p-2 bg-slate-50 rounded-lg text-[10px] font-black text-slate-400 px-3 uppercase tracking-widest">Docentes</div>
-          </div>
-          <div className="h-72">
-            {stats.teacherData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-slate-400 font-medium text-xs">
-                Sin profesores registrados
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 space-y-10">
+          
+          {/* TAB 1: OVERVIEW */}
+          {activeTab === 'overview' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div>
+                <h3 className="text-2xl font-black tracking-tight text-slate-800">Resumen General</h3>
+                <p className="text-sm text-slate-500 font-medium mt-1">Estadísticas y métricas del ecosistema de proyectos.</p>
               </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stats.teacherData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
-                  <XAxis type="number" hide allowDecimals={false} />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category" 
-                    fontSize={10} 
-                    width={110} 
-                    tick={{ fontWeight: 700, fill: '#64748B' }} 
-                    axisLine={false} 
-                    tickLine={false}
-                    tickFormatter={(val: string) => val.length > 16 ? `${val.slice(0, 14)}...` : val}
-                  />
-                  <Tooltip 
-                    cursor={{ fill: '#F8FAFC' }} 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
-                    formatter={(value: any) => [`${value} proyecto(s)`, 'Proyectos']}
-                  />
-                  <Bar dataKey="value" fill="#00594E" radius={[0, 8, 8, 0]} barSize={24} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Project List */}
-      <div className="card-modern overflow-hidden">
-        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <h3 className="text-xl font-black tracking-tight text-slate-800">Proyectos inscritos</h3>
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Buscar proyecto o categoría..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-2xl text-sm font-medium focus:bg-white focus:ring-4 focus:ring-exis-primary/5 border-2 border-transparent focus:border-exis-primary/20 outline-none transition-all"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-100">
-          {filteredProjects.length === 0 ? (
-            <div className="p-12 text-center text-slate-400 bg-white col-span-full">
-              <p className="text-sm font-black uppercase tracking-widest">No se encontraron coincidencias</p>
+              {/* Overview Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  { label: 'Proyectos Registrados', value: stats.totalProjects, icon: LayoutDashboard, color: 'text-exis-primary', bg: 'bg-exis-primary/10' },
+                  { label: 'Total Participantes', value: projects.reduce((acc, p) => acc + p.students.length, 0), icon: Users, color: 'text-exis-secondary', bg: 'bg-exis-secondary/10' },
+                  { label: 'Categorías Activas', value: stats.categoryData.length, icon: Briefcase, color: 'text-exis-accent', bg: 'bg-exis-accent/10' }
+                ].map((item, i) => (
+                  <div key={i} className="bg-white rounded-3xl p-6 flex items-center gap-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                    <div className={`p-4 ${item.bg} ${item.color} rounded-2xl`}>
+                      <item.icon size={24} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{item.label}</p>
+                      <p className="text-3xl font-black text-slate-800 tracking-tighter leading-none">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Charts Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-black tracking-tight text-slate-800">Por Categorías</h3>
+                    <TrendingUp size={16} className="text-slate-400" />
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={stats.categoryData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                          {stats.categoryData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="outline-none" />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }} />
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm lg:col-span-2">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-black tracking-tight text-slate-800">Proyectos por Asignatura</h3>
+                    <div className="px-2 py-1 bg-slate-50 rounded text-[9px] font-black text-slate-400 uppercase tracking-widest">Top 5</div>
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={stats.subjectData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+                        <XAxis type="number" hide />
+                        <YAxis dataKey="name" type="category" fontSize={10} width={130} tick={{ fontWeight: 700, fill: '#64748B' }} axisLine={false} tickLine={false} tickFormatter={(val: string) => val.length > 20 ? `${val.slice(0, 18)}...` : val} />
+                        <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                        <Bar dataKey="value" fill="#B5A160" radius={[0, 6, 6, 0]} barSize={20} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
             </div>
-          ) : (
-            filteredProjects.map((project) => (
-              <button
-                key={project.name}
-                onClick={() => {
-                  setSelectedProject(project);
-                  setIsEditing(false);
-                }}
-                className="group bg-white p-8 text-left hover:bg-slate-50/50 transition-all duration-300"
-              >
-                <div className="mb-4 inline-block px-3 py-1 bg-exis-primary/5 text-exis-primary text-[10px] font-black uppercase tracking-widest rounded-full">
-                  {project.category}
-                </div>
-                <h4 className="text-lg font-black text-slate-800 tracking-tight mb-2 group-hover:text-exis-primary transition-colors line-clamp-1">{project.name}</h4>
-                <p className="text-sm text-slate-400 line-clamp-2 mb-6 font-medium leading-relaxed">{project.description}</p>
-                <div className="flex items-center justify-between mt-auto">
-                  <div className="flex -space-x-2">
-                    {project.students.map((_, i) => (
-                      <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400">
-                        {i + 1}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="p-2 rounded-xl bg-slate-50 text-slate-300 group-hover:bg-exis-primary group-hover:text-white transition-all">
-                    <ArrowRight size={18} />
-                  </div>
-                </div>
-              </button>
-            ))
           )}
-        </div>
-      </div>
+
+          {/* TAB 2: PROJECTS TABLE */}
+          {activeTab === 'projects' && (
+            <div className="space-y-6 animate-in fade-in duration-500 flex flex-col h-[calc(100vh-8rem)]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+                <div>
+                  <h3 className="text-2xl font-black tracking-tight text-slate-800">Directorio de Proyectos</h3>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Gestiona todos los proyectos inscritos en el sistema.</p>
+                </div>
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <input 
+                    type="text" 
+                    placeholder="Buscar..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-all shadow-sm"
+                  />
+                </div>
+              </div>
+              
+              {/* Data Table */}
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                <div className="overflow-x-auto flex-1">
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-6 py-4">Proyecto</th>
+                        <th className="px-6 py-4">Categoría</th>
+                        <th className="px-6 py-4">Integrantes</th>
+                        <th className="px-6 py-4">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredProjects.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-12 text-center text-slate-400 font-bold">
+                            No se encontraron coincidencias
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredProjects.map((project) => (
+                          <tr key={project.name} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="font-bold text-slate-800 truncate max-w-xs">{project.name}</div>
+                              <div className="text-[10px] font-medium text-slate-400 truncate max-w-xs">{project.description}</div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-md">
+                                {project.category}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex -space-x-2">
+                                {project.students.map((stud, i) => (
+                                  <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[9px] font-black text-slate-500 relative group cursor-default">
+                                    {stud.name.charAt(0)}
+                                    {/* Tooltip on hover */}
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20 whitespace-nowrap">
+                                      {stud.name}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <button
+                                onClick={() => {
+                                  setSelectedProject(project);
+                                  setIsEditing(false);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-exis-primary/10 hover:bg-exis-primary/20 text-exis-primary font-bold text-[10px] uppercase tracking-wider rounded-lg transition-colors"
+                              >
+                                <Edit size={12} /> Ver / Editar
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: SETTINGS */}
+          {activeTab === 'settings' && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <div>
+                <h3 className="text-2xl font-black tracking-tight text-slate-800">Configuraciones Globales</h3>
+                <p className="text-sm text-slate-500 font-medium mt-1">Ajustes generales del sistema y restricciones.</p>
+              </div>
+
+              <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-slate-50 rounded-xl text-slate-400 border border-slate-100 mt-1">
+                      <Lock size={24} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-lg">Control de Inscripciones</h4>
+                      <p className="text-sm text-slate-500 font-medium mt-1 leading-relaxed max-w-xl">
+                        Activa o desactiva la recepción de nuevos proyectos. Cuando está cerrado, el formulario público mostrará un aviso de restricción y no permitirá envíos, protegiendo la base de datos de inscripciones tardías.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-3 shrink-0">
+                    <div className="flex items-center gap-3 bg-slate-50 px-6 py-4 rounded-2xl border border-slate-200">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Estado:</span>
+                      <button 
+                        onClick={toggleRegistration}
+                        className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none shadow-inner ${!isRegistrationClosed ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                      >
+                        <span className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform shadow-sm ${!isRegistrationClosed ? 'translate-x-7' : 'translate-x-1'}`} />
+                      </button>
+                      <span className={`text-[10px] font-black uppercase tracking-widest w-16 text-center ${!isRegistrationClosed ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {!isRegistrationClosed ? 'Abiertas' : 'Cerradas'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
       {/* DETAIL & EDIT MODAL */}
       {selectedProject && (
