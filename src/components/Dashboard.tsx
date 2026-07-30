@@ -633,7 +633,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm lg:col-span-2">
+                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-base font-black tracking-tight text-slate-800">Proyectos por Asignatura</h3>
                     <div className="px-2 py-1 bg-slate-50 rounded text-[9px] font-black text-slate-400 uppercase tracking-widest">Top 5</div>
@@ -648,6 +648,43 @@ export default function Dashboard() {
                         <Bar dataKey="value" fill="#B5A160" radius={[0, 6, 6, 0]} barSize={20} />
                       </BarChart>
                     </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-black tracking-tight text-slate-800">Proyectos por Profesor</h3>
+                    <div className="px-2 py-1 bg-slate-50 rounded text-[9px] font-black text-slate-400 uppercase tracking-widest">Docentes</div>
+                  </div>
+                  <div className="h-64">
+                    {stats.teacherData.length === 0 ? (
+                      <div className="h-full flex items-center justify-center text-slate-400 font-medium text-xs">
+                        Sin profesores registrados
+                      </div>
+                    ) : (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={stats.teacherData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+                          <XAxis type="number" hide allowDecimals={false} />
+                          <YAxis 
+                            dataKey="name" 
+                            type="category" 
+                            fontSize={10} 
+                            width={110} 
+                            tick={{ fontWeight: 700, fill: '#64748B' }} 
+                            axisLine={false} 
+                            tickLine={false}
+                            tickFormatter={(val: string) => val.length > 16 ? `${val.slice(0, 14)}...` : val}
+                          />
+                          <Tooltip 
+                            cursor={{ fill: '#F8FAFC' }} 
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', fontSize: '11px', fontWeight: 'bold' }}
+                            formatter={(value: any) => [`${value} proyecto(s)`, 'Proyectos']}
+                          />
+                          <Bar dataKey="value" fill="#00594E" radius={[0, 6, 6, 0]} barSize={20} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
                   </div>
                 </div>
               </div>
