@@ -87,6 +87,11 @@ export default function RegistrationForm() {
         .select('value')
         .eq('key', 'is_registration_closed')
         .single();
+      
+      if (error) {
+        console.error('Error al leer el estado de las inscripciones:', error);
+      }
+      
       if (data && !error) {
         setIsClosed(data.value === true || data.value === 'true');
       }
