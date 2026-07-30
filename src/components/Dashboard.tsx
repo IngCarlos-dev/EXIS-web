@@ -68,6 +68,24 @@ export default function Dashboard() {
   const [selectedProject, setSelectedProject] = useState<ProjectWithStudents | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Registration Status
+  const [isRegistrationClosed, setIsRegistrationClosed] = useState(true);
+
+  const toggleRegistration = async () => {
+    const newValue = !isRegistrationClosed;
+    const { error } = await supabase
+      .from('settings')
+      .update({ value: newValue })
+      .eq('key', 'is_registration_closed');
+      
+    if (!error) {
+      setIsRegistrationClosed(newValue);
+      alert(`Inscripciones ${newValue ? 'CERRADAS' : 'ABIERTAS'} exitosamente.`);
+    } else {
+      alert('Error al actualizar el estado. Por favor verifica que la tabla settings exista en Supabase.');
+    }
+  };
+
   // Edit Mode States
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
@@ -87,6 +105,8 @@ export default function Dashboard() {
 
   async function fetchData() {
     setLoading(true);
+    
+    // Fetch projects
     const { data, error } = await supabase
       .from('projects')
       .select('*, students(*)');
@@ -96,6 +116,22 @@ export default function Dashboard() {
     } else {
       setProjects(data as ProjectWithStudents[]);
     }
+
+    // Fetch registration status
+    try {
+      const { data: statusData } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'is_registration_closed')
+        .single();
+      
+      if (statusData) {
+        setIsRegistrationClosed(statusData.value === true || statusData.value === 'true');
+      }
+    } catch (e) {
+      console.error('Error fetching registration status (table might not exist yet)', e);
+    }
+
     setLoading(false);
   }
 
@@ -459,17 +495,35 @@ export default function Dashboard() {
     <div className="space-y-12 animate-in fade-in duration-700">
       
       {/* Admin Logged-In Header */}
-      <div className="flex justify-between items-center p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl">
+      <div className="flex flex-col sm:flex-row justify-between items-center p-4 bg-emerald-50 border border-emerald-200/80 rounded-2xl gap-4">
         <div className="flex items-center gap-2 text-emerald-700">
           <CheckCircle2 size={16} />
           <span className="text-xs font-bold">Sesión Administrativa Activa</span>
         </div>
-        <button 
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-xs font-black text-rose-600 hover:text-rose-700 uppercase tracking-wider transition-colors"
-        >
-          <LogOut size={14} /> Cerrar Sesión
-        </button>
+        
+        <div className="flex items-center gap-4">
+          {/* Toggle Button */}
+          <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-emerald-100 shadow-sm">
+            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Inscripciones:</span>
+            <button 
+              onClick={toggleRegistration}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${!isRegistrationClosed ? 'bg-emerald-500' : 'bg-rose-500'}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!isRegistrationClosed ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
+            <span className={`text-[10px] font-black uppercase tracking-widest ${!isRegistrationClosed ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {!isRegistrationClosed ? 'Abiertas' : 'Cerradas'}
+            </span>
+          </div>
+
+          {/* Logout Button */}
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 text-xs font-black text-rose-600 hover:text-rose-700 uppercase tracking-wider transition-colors ml-2 sm:ml-4 sm:border-l sm:border-emerald-200 sm:pl-4"
+          >
+            <LogOut size={14} /> Cerrar Sesión
+          </button>
+        </div>
       </div>
 
       {/* Overview Cards */}

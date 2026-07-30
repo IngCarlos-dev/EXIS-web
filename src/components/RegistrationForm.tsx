@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CountdownTimer from './CountdownTimer';
 import { supabase } from '../lib/supabase';
 import type { Category, Student } from '../types';
@@ -78,7 +78,21 @@ export default function RegistrationForm() {
     });
   };
 
-  const isClosed = true;
+  const [isClosed, setIsClosed] = useState(true);
+
+  useEffect(() => {
+    async function checkStatus() {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'is_registration_closed')
+        .single();
+      if (data && !error) {
+        setIsClosed(data.value === true || data.value === 'true');
+      }
+    }
+    checkStatus();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,15 +206,17 @@ export default function RegistrationForm() {
 
         <form onSubmit={handleSubmit} className="p-10 space-y-12">
           {/* Inscriptions Closed Alert Banner */}
-          <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-4 text-rose-800">
-            <Lock size={24} className="text-rose-600 shrink-0" />
-            <div>
-              <p className="text-base font-extrabold">Inscripciones Cerradas</p>
-              <p className="text-xs font-medium text-rose-700 mt-0.5">
-                El plazo para la recepción de registros en EXIS 2026-A ha expirado. El botón de registro ha sido deshabilitado.
-              </p>
+          {isClosed && (
+            <div className="p-6 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-4 text-rose-800">
+              <Lock size={24} className="text-rose-600 shrink-0" />
+              <div>
+                <p className="text-base font-extrabold">Inscripciones Cerradas</p>
+                <p className="text-xs font-medium text-rose-700 mt-0.5">
+                  El plazo para la recepción de registros en EXIS 2026-A ha expirado. El botón de registro ha sido deshabilitado.
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           {/* Project Section */}
           <section className="space-y-8">
             <div className="flex items-center gap-4">
@@ -546,14 +562,31 @@ export default function RegistrationForm() {
           )}
 
           <div className="pt-6">
-            <button
-              disabled={true}
-              type="button"
-              className="w-full py-5 text-lg tracking-tight font-bold rounded-2xl bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none flex items-center justify-center gap-3 transition-all"
-            >
-              <Lock size={20} className="text-slate-400" />
-              <span>Registrar Proyecto (Inscripciones Cerradas)</span>
-            </button>
+            {isClosed ? (
+              <button
+                disabled={true}
+                type="button"
+                className="w-full py-5 text-lg tracking-tight font-bold rounded-2xl bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300 shadow-none flex items-center justify-center gap-3 transition-all"
+              >
+                <Lock size={20} className="text-slate-400" />
+                <span>Registrar Proyecto (Inscripciones Cerradas)</span>
+              </button>
+            ) : (
+              <button
+                disabled={loading}
+                type="submit"
+                className="btn-primary w-full py-5 text-lg tracking-tight group"
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mx-auto"></div>
+                ) : (
+                  <div className="flex items-center justify-center gap-3">
+                    <span>Registrar Proyecto</span>
+                    <Send size={20} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </div>
+                )}
+              </button>
+            )}
           </div>
         </form>
       </div>
