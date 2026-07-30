@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Project, Student } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, 
   IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink, Lock, 
@@ -479,13 +480,13 @@ export default function Dashboard() {
                     type="text"
                     value={verifyHash}
                     onChange={(e) => setVerifyHash(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm font-semibold tracking-tight text-white placeholder-slate-500 focus:bg-white/10 focus:border-exis-secondary outline-none transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm font-semibold tracking-tight text-white placeholder-slate-500 focus:bg-white/10 focus:border-exis-secondary outline-none transition-colors duration-200 active:scale-[0.98]"
                     placeholder="SEC-EXIS-2026-A-XXXXXXXX-XXXXXXXX"
                   />
                   <button 
                     type="submit" 
                     disabled={verifying}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-4 py-2 bg-exis-secondary hover:bg-exis-secondary/90 text-slate-900 font-bold text-xs rounded-xl transition-all"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 px-4 py-2 bg-exis-secondary hover:bg-exis-secondary/90 text-slate-900 font-bold text-xs rounded-xl transition-colors duration-200 active:scale-[0.98]"
                   >
                     {verifying ? 'Validando...' : 'Verificar'}
                   </button>
@@ -560,19 +561,19 @@ export default function Dashboard() {
           <div className="p-4 space-y-2">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'overview' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors duration-200 active:scale-[0.98] ${activeTab === 'overview' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
             >
               <LayoutDashboard size={18} /> Resumen
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'projects' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors duration-200 active:scale-[0.98] ${activeTab === 'projects' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
             >
               <List size={18} /> Proyectos
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'settings' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors duration-200 active:scale-[0.98] ${activeTab === 'settings' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
             >
               <Settings size={18} /> Configuraciones
             </button>
@@ -581,7 +582,7 @@ export default function Dashboard() {
         <div className="p-4 border-t border-slate-100">
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-all shadow-sm"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-rose-50 hover:bg-rose-100 border border-rose-100 text-rose-600 font-black uppercase tracking-wider text-[10px] rounded-xl transition-colors duration-200 active:scale-[0.98] shadow-sm"
           >
             <LogOut size={16} /> Cerrar Sesión
           </button>
@@ -608,10 +609,17 @@ export default function Dashboard() {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 space-y-10">
-          
+          <AnimatePresence mode="wait">
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
-            <div className="space-y-8 animate-in fade-in duration-500">
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
               <div>
                 <h3 className="text-2xl font-black tracking-tight text-slate-800">Resumen General</h3>
                 <p className="text-sm text-slate-500 font-medium mt-1">Estadísticas y métricas del ecosistema de proyectos.</p>
@@ -625,7 +633,7 @@ export default function Dashboard() {
                   { label: 'Docentes Asignados', value: stats.totalTeachers, icon: GraduationCap, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
                   { label: 'Promedio Alumnos', value: stats.avgStudents, icon: TrendingUp, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' }
                 ].map((item, i) => (
-                  <div key={i} className={`bg-white rounded-3xl p-5 md:p-6 flex flex-col xl:flex-row items-start xl:items-center gap-4 xl:gap-5 border shadow-sm hover:shadow-md transition-all ${item.border}`}>
+                  <div key={i} className={`bg-white rounded-3xl p-5 md:p-6 flex flex-col xl:flex-row items-start xl:items-center gap-4 xl:gap-5 border shadow-sm hover:shadow-md transition-colors duration-200 active:scale-[0.98] ${item.border}`}>
                     <div className={`p-3 md:p-4 ${item.bg} ${item.color} rounded-2xl shrink-0`}>
                       <item.icon size={24} className="md:w-6 md:h-6 w-5 h-5" />
                     </div>
@@ -713,12 +721,19 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* TAB 2: PROJECTS TABLE */}
           {activeTab === 'projects' && (
-            <div className="space-y-6 animate-in fade-in duration-500 flex flex-col h-[calc(100vh-8rem)]">
+            <motion.div
+              key="projects"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6 flex flex-col h-[calc(100vh-8rem)]"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
                 <div>
                   <h3 className="text-2xl font-black tracking-tight text-slate-800">Directorio de Proyectos</h3>
@@ -731,7 +746,7 @@ export default function Dashboard() {
                     placeholder="Buscar..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-all shadow-sm"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
                   />
                 </div>
               </div>
@@ -801,12 +816,19 @@ export default function Dashboard() {
                   </table>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* TAB 3: SETTINGS */}
           {activeTab === 'settings' && (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
               <div>
                 <h3 className="text-2xl font-black tracking-tight text-slate-800">Configuraciones Globales</h3>
                 <p className="text-sm text-slate-500 font-medium mt-1">Ajustes generales del sistema y restricciones.</p>
@@ -841,8 +863,9 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
         </div>
       </div>
@@ -859,7 +882,7 @@ export default function Dashboard() {
                   setSelectedProject(null);
                   setIsEditing(false);
                 }}
-                className="absolute top-8 right-8 p-3 hover:bg-white/10 rounded-2xl transition-all"
+                className="absolute top-8 right-8 p-3 hover:bg-white/10 rounded-2xl transition-colors duration-200 active:scale-[0.98]"
               >
                 <X size={24} />
               </button>
@@ -876,7 +899,7 @@ export default function Dashboard() {
                       type="text"
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-xl font-bold tracking-tight text-white focus:bg-white/15 outline-none transition-all"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-xl font-bold tracking-tight text-white focus:bg-white/15 outline-none transition-colors duration-200 active:scale-[0.98]"
                     />
                   </div>
                   <div className="space-y-1">
@@ -1185,9 +1208,9 @@ export default function Dashboard() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {selectedProject.students.map((student) => (
-                        <div key={student.document_id} className="bg-white p-6 rounded-3xl border-2 border-slate-50 hover:border-exis-primary/10 transition-all group">
+                        <div key={student.document_id} className="bg-white p-6 rounded-3xl border-2 border-slate-50 hover:border-exis-primary/10 transition-colors duration-200 active:scale-[0.98] group">
                           <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-exis-primary group-hover:bg-exis-primary group-hover:text-white transition-all">
+                            <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-exis-primary group-hover:bg-exis-primary group-hover:text-white transition-colors duration-200 active:scale-[0.98]">
                               <Users size={24} />
                             </div>
                             <div>
@@ -1246,20 +1269,20 @@ export default function Dashboard() {
                   <>
                     <button
                       onClick={deleteProject}
-                      className="flex items-center gap-2 px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                      className="flex items-center gap-2 px-6 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-colors duration-200 active:scale-[0.98]"
                     >
                       <Trash2 size={14} /> Eliminar
                     </button>
                     <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
                     <button
                       onClick={() => updateProjectStatus('Aprobado')}
-                      className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                      className="flex items-center gap-2 px-6 py-3 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-colors duration-200 active:scale-[0.98]"
                     >
                       <CheckCircle2 size={14} /> Aprobar
                     </button>
                     <button
                       onClick={() => updateProjectStatus('Rechazado')}
-                      className="flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                      className="flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-colors duration-200 active:scale-[0.98]"
                     >
                       <X size={14} /> Rechazar
                     </button>
@@ -1271,13 +1294,13 @@ export default function Dashboard() {
                   <>
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-200 transition-all"
+                      className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-200 transition-colors duration-200 active:scale-[0.98]"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={saveChanges}
-                      className="flex items-center gap-1.5 px-8 py-3 bg-exis-primary hover:bg-exis-primary/95 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                      className="flex items-center gap-1.5 px-8 py-3 bg-exis-primary hover:bg-exis-primary/95 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl transition-colors duration-200 active:scale-[0.98]"
                     >
                       <Save size={14} /> Guardar Cambios
                     </button>
@@ -1286,13 +1309,13 @@ export default function Dashboard() {
                   <>
                     <button
                       onClick={startEditing}
-                      className="flex items-center gap-1.5 px-8 py-3 bg-exis-secondary hover:bg-exis-secondary/90 text-slate-900 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all"
+                      className="flex items-center gap-1.5 px-8 py-3 bg-exis-secondary hover:bg-exis-secondary/90 text-slate-900 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-colors duration-200 active:scale-[0.98]"
                     >
                       <Edit size={14} /> Editar Proyecto
                     </button>
                     <button
                       onClick={() => setSelectedProject(null)}
-                      className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-200 transition-all"
+                      className="px-8 py-3 bg-white hover:bg-slate-100 text-slate-600 font-black uppercase tracking-widest text-[10px] rounded-2xl border border-slate-200 transition-colors duration-200 active:scale-[0.98]"
                     >
                       Cerrar
                     </button>
