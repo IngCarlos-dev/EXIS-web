@@ -779,6 +779,9 @@ export default function Dashboard() {
             </div>
           )}
 
+        </div>
+      </div>
+
       {/* DETAIL & EDIT MODAL */}
       {selectedProject && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-6 overflow-y-auto animate-in fade-in duration-300">
