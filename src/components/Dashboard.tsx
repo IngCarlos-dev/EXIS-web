@@ -73,7 +73,8 @@ export default function Dashboard() {
   // Registration Status
   const [isRegistrationClosed, setIsRegistrationClosed] = useState(true);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'projects' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'projects' | 'students' | 'settings'>('overview');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -349,6 +350,35 @@ export default function Dashboard() {
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  interface StudentWithProjects extends Student {
+    projects: ProjectWithStudents[];
+  }
+
+  const allStudents = useMemo(() => {
+    const studentMap = new Map<string, StudentWithProjects>();
+    projects.forEach(p => {
+      p.students.forEach(s => {
+        const key = s.document_id;
+        if (studentMap.has(key)) {
+          const existing = studentMap.get(key)!;
+          // Evitar duplicar proyectos si por error hay registros extraños
+          if (!existing.projects.some(ep => ep.name === p.name)) {
+            existing.projects.push(p);
+          }
+        } else {
+          studentMap.set(key, { ...s, projects: [p] });
+        }
+      });
+    });
+    return Array.from(studentMap.values());
+  }, [projects]);
+
+  const filteredStudents = allStudents.filter(s => 
+    s.name.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+    s.document_id.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
+    s.email.toLowerCase().includes(studentSearchTerm.toLowerCase())
+  );
+
   // Compute stats for admin
   const stats = useMemo(() => {
     const totalProjects = projects.length;
@@ -572,6 +602,12 @@ export default function Dashboard() {
               <List size={18} /> Proyectos
             </button>
             <button
+              onClick={() => setActiveTab('students')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors duration-200 active:scale-[0.98] ${activeTab === 'students' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+              <Users size={18} /> Estudiantes
+            </button>
+            <button
               onClick={() => setActiveTab('settings')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors duration-200 active:scale-[0.98] ${activeTab === 'settings' ? 'bg-exis-primary text-white shadow-md shadow-exis-primary/20' : 'text-slate-500 hover:bg-slate-100'}`}
             >
@@ -609,6 +645,7 @@ export default function Dashboard() {
             <a href="/" className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 transition-colors" title="Nuevo Proyecto"><Plus size={18} /></a>
             <button onClick={() => setActiveTab('overview')} className={`p-2 rounded-lg ${activeTab === 'overview' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><LayoutDashboard size={18} /></button>
             <button onClick={() => setActiveTab('projects')} className={`p-2 rounded-lg ${activeTab === 'projects' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><List size={18} /></button>
+            <button onClick={() => setActiveTab('students')} className={`p-2 rounded-lg ${activeTab === 'students' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><Users size={18} /></button>
             <button onClick={() => setActiveTab('settings')} className={`p-2 rounded-lg ${activeTab === 'settings' ? 'bg-exis-primary text-white' : 'bg-slate-100 text-slate-500'}`}><Settings size={18} /></button>
             <button onClick={handleLogout} className="p-2 rounded-lg bg-rose-50 text-rose-600"><LogOut size={18} /></button>
           </div>
@@ -826,7 +863,94 @@ export default function Dashboard() {
             </motion.div>
           )}
 
-          {/* TAB 3: SETTINGS */}
+          {/* TAB 3: STUDENTS DIRECTORY */}
+          {activeTab === 'students' && (
+            <motion.div
+              key="students"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6 flex flex-col h-[calc(100vh-8rem)]"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
+                <div>
+                  <h3 className="text-2xl font-black tracking-tight text-slate-800">Directorio de Estudiantes</h3>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Explora los estudiantes registrados y sus proyectos.</p>
+                </div>
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <input 
+                    type="text" 
+                    placeholder="Buscar estudiante..." 
+                    value={studentSearchTerm}
+                    onChange={(e) => setStudentSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
+                  />
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex-1 flex flex-col">
+                <div className="overflow-x-auto flex-1">
+                  <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-500 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-6 py-4">Estudiante</th>
+                        <th className="px-6 py-4">Semestre</th>
+                        <th className="px-6 py-4">Proyectos</th>
+                        <th className="px-6 py-4">Contacto</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredStudents.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-12 text-center text-slate-400 font-bold">
+                            No se encontraron coincidencias
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredStudents.map((stud, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="px-6 py-4">
+                              <div className="font-bold text-slate-800">{stud.name}</div>
+                              <div className="text-[10px] font-medium text-slate-400 mt-0.5">{stud.document_type} {stud.document_id}</div>
+                            </td>
+                            <td className="px-6 py-4 font-medium text-slate-600">
+                              {stud.semester}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex flex-col gap-2">
+                                {stud.projects.length > 1 && (
+                                  <div className="inline-flex items-center self-start gap-1 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700">
+                                    <AlertTriangle size={10} /> Múltiples Proyectos
+                                  </div>
+                                )}
+                                <div className="flex flex-wrap gap-2">
+                                  {stud.projects.map((p, i) => (
+                                    <span key={i} className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md max-w-xs truncate" title={p.name}>
+                                      {p.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex flex-col gap-1 text-[11px] font-medium text-slate-500">
+                                <span className="flex items-center gap-1.5"><Mail size={12} className="text-slate-400"/> {stud.email}</span>
+                                <span className="flex items-center gap-1.5"><Phone size={12} className="text-slate-400"/> {stud.phone}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 4: SETTINGS */}
           {activeTab === 'settings' && (
             <motion.div
               key="settings"
