@@ -9,6 +9,7 @@ import {
   IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink, Lock, 
   CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List, Plus, Download
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const COLORS = ['#00594E', '#B5A160', '#36BCEE', '#6366F1', '#EC4899', '#F59E0B'];
 
@@ -380,31 +381,38 @@ export default function Dashboard() {
   );
 
   const exportStudentContacts = () => {
-    const headers = ['Nombre', 'Tipo Documento', 'Documento', 'Email', 'Teléfono', 'Semestre', 'Proyectos'];
-    const rows = filteredStudents.map(s => {
+    const data = filteredStudents.map(s => {
       const projectNames = s.projects.map(p => p.name).join('; ');
-      return [
-        `"${s.name}"`,
-        `"${s.document_type}"`,
-        `"${s.document_id}"`,
-        `"${s.email}"`,
-        `"${s.phone}"`,
-        `"${s.semester}"`,
-        `"${projectNames}"`
-      ].join(',');
+      return {
+        'Nombre': s.name,
+        'Tipo Documento': s.document_type,
+        'Documento': s.document_id,
+        'Email': s.email,
+        'Teléfono': s.phone,
+        'Semestre': s.semester,
+        'Proyectos': projectNames
+      };
     });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Ajustar el ancho de las columnas para que esté súper bien organizado
+    worksheet['!cols'] = [
+      { wch: 35 }, // Nombre
+      { wch: 18 }, // Tipo Documento
+      { wch: 15 }, // Documento
+      { wch: 40 }, // Email
+      { wch: 15 }, // Teléfono
+      { wch: 10 }, // Semestre
+      { wch: 60 }, // Proyectos
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Contactos_Estudiantes');
+
+    XLSX.writeFile(workbook, 'contactos_estudiantes.xlsx');
     
-    // Agregamos BOM para UTF-8 (para que Excel abra bien las tildes y ñ)
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'contactos_estudiantes.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast('Contactos exportados exitosamente');
+    showToast('Contactos exportados en Excel exitosamente');
   };
 
   // Compute stats for admin
