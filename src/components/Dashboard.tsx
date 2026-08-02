@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, Users, Briefcase, ChevronRight, X, Phone, Mail, GraduationCap, 
   IdCard, Search, ArrowRight, TrendingUp, Code2, ExternalLink, Lock, 
-  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List, Plus
+  CheckCircle2, AlertTriangle, LogOut, Edit, Trash2, Save, Settings, List, Plus, Download
 } from 'lucide-react';
 
 const COLORS = ['#00594E', '#B5A160', '#36BCEE', '#6366F1', '#EC4899', '#F59E0B'];
@@ -378,6 +378,34 @@ export default function Dashboard() {
     s.document_id.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
     s.email.toLowerCase().includes(studentSearchTerm.toLowerCase())
   );
+
+  const exportStudentContacts = () => {
+    const headers = ['Nombre', 'Tipo Documento', 'Documento', 'Email', 'Teléfono', 'Semestre', 'Proyectos'];
+    const rows = filteredStudents.map(s => {
+      const projectNames = s.projects.map(p => p.name).join('; ');
+      return [
+        `"${s.name}"`,
+        `"${s.document_type}"`,
+        `"${s.document_id}"`,
+        `"${s.email}"`,
+        `"${s.phone}"`,
+        `"${s.semester}"`,
+        `"${projectNames}"`
+      ].join(',');
+    });
+    
+    // Agregamos BOM para UTF-8 (para que Excel abra bien las tildes y ñ)
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'contactos_estudiantes.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Contactos exportados exitosamente');
+  };
 
   // Compute stats for admin
   const stats = useMemo(() => {
@@ -878,15 +906,23 @@ export default function Dashboard() {
                   <h3 className="text-2xl font-black tracking-tight text-slate-800">Directorio de Estudiantes</h3>
                   <p className="text-sm text-slate-500 font-medium mt-1">Explora los estudiantes registrados y sus proyectos.</p>
                 </div>
-                <div className="relative w-full sm:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                  <input 
-                    type="text" 
-                    placeholder="Buscar estudiante..." 
-                    value={studentSearchTerm}
-                    onChange={(e) => setStudentSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
-                  />
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                  <button
+                    onClick={exportStudentContacts}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors shadow-sm w-full sm:w-auto justify-center focus:ring-2 focus:ring-exis-primary/20 outline-none"
+                  >
+                    <Download size={16} className="text-slate-400" /> Exportar
+                  </button>
+                  <div className="relative w-full sm:w-72">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Buscar estudiante..." 
+                      value={studentSearchTerm}
+                      onChange={(e) => setStudentSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
+                    />
+                  </div>
                 </div>
               </div>
               
