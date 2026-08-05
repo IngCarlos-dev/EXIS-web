@@ -353,7 +353,7 @@ export default function Dashboard() {
 
   const exportProjectsData = () => {
     const data = filteredProjects.map(p => {
-      const integrantes = p.students ? p.students.map(s => s.name).join('; ') : '';
+      const integrantes = p.students ? p.students.map(s => s.name).join(', ') : '';
       return {
         'Nombre del proyecto': p.name,
         'Categoría': p.category,
