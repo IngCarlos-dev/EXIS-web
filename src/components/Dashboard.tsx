@@ -351,6 +351,34 @@ export default function Dashboard() {
     p.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const exportProjectsData = () => {
+    const data = filteredProjects.map(p => {
+      const integrantes = p.students ? p.students.map(s => s.name).join('; ') : '';
+      return {
+        'Nombre del proyecto': p.name,
+        'Categoría': p.category,
+        'Descripción': p.description,
+        'Integrantes': integrantes
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    worksheet['!cols'] = [
+      { wch: 40 }, // Nombre del proyecto
+      { wch: 25 }, // Categoría
+      { wch: 60 }, // Descripción
+      { wch: 50 }, // Integrantes
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Proyectos');
+    
+    XLSX.writeFile(workbook, 'proyectos_exis.xlsx');
+    
+    showToast("Proyectos exportados correctamente", "success");
+  };
+
   interface StudentWithProjects extends Student {
     projects: ProjectWithStudents[];
   }
@@ -819,15 +847,23 @@ export default function Dashboard() {
                   <h3 className="text-2xl font-black tracking-tight text-slate-800">Directorio de Proyectos</h3>
                   <p className="text-sm text-slate-500 font-medium mt-1">Gestiona todos los proyectos inscritos en el sistema.</p>
                 </div>
-                <div className="relative w-full sm:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                  <input 
-                    type="text" 
-                    placeholder="Buscar..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
-                  />
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                  <button
+                    onClick={exportProjectsData}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold text-sm rounded-xl hover:bg-slate-50 transition-colors shadow-sm w-full sm:w-auto justify-center focus:ring-2 focus:ring-exis-primary/20 outline-none"
+                  >
+                    <Download size={16} className="text-slate-400" /> Exportar
+                  </button>
+                  <div className="relative w-full sm:w-72">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Buscar..." 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm font-medium focus:ring-2 focus:ring-exis-primary/20 border border-slate-200 outline-none transition-colors duration-200 active:scale-[0.98] shadow-sm"
+                    />
+                  </div>
                 </div>
               </div>
               
